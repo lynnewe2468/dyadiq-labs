@@ -11,6 +11,9 @@ des beworbenen HR-Tools durchführen.
 > ausgeschlossen. Sie ist damit praktisch nur über Link/QR-Code erreichbar —
 > GitHub Pages ist bei kostenlosen Accounts aber **technisch immer öffentlich**.
 
+**QR-Code** für die Zenturie: `assets/qr-code.png` (Druck) bzw. `assets/qr-code.svg` (Folie).
+Beide zeigen auf die Übersichtsseite.
+
 ## Die drei Bereiche
 
 | Seite | Inhalt |
@@ -30,21 +33,30 @@ des beworbenen HR-Tools durchführen.
 Die Moderationsansicht zeigt zusätzlich zu jeder Abgabe die vollständigen Antworten
 (Aufklappen unter „Details") sowie die Zahl der Abgaben.
 
-## Einrichtung der Datenbank
+## Datenbank
 
 Die Abgaben laufen über **Supabase** (kostenlose Stufe), damit alle Betrachter
-dieselben Ergebnisse sehen.
+dieselben Ergebnisse sehen. Das Projekt ist eingerichtet, `config.js` ist gefüllt —
+es ist nichts weiter zu tun.
 
-1. Projekt auf [supabase.com](https://supabase.com) anlegen (Login geht mit GitHub).
-2. `supabase-setup.sql` vollständig in den **SQL Editor** kopieren und ausführen.
-3. Unter *Project Settings → API* die **Project URL** und den **anon public**-Key kopieren.
-4. Beides in `config.js` eintragen, dazu einen eigenen `presenterCode` setzen.
+- Projekt `dyadiq-labs`, Region `eu-central-1`
+- Schema und Zugriffsregeln: `supabase-setup.sql` (bereits eingespielt)
 
-Ohne diese Konfiguration läuft die Seite in einem **Testmodus**: alles funktioniert,
-die Eingaben bleiben aber nur im jeweiligen Browser. Ein Hinweisbanner weist darauf hin.
+Der anon-Key steht bewusst offen in `config.js` — so ist er bei Supabase gedacht.
+Was er darf, regeln die RLS-Policies: Abgaben **lesen und anlegen** sowie den
+Session-Zustand umschalten. Ändern und Löschen ist nicht möglich.
 
-Der anon-Key gehört öffentlich in den Quelltext — was er darf, regeln die
-RLS-Policies in `supabase-setup.sql`: Abgaben lesen und anlegen, sonst nichts.
+Ohne Konfiguration liefe die Seite in einem **Testmodus** (Eingaben nur lokal im
+Browser, mit Hinweisbanner) — das ist der Fallback, falls `config.js` mal leer ist.
+
+### Vor bzw. nach der Präsentation zurücksetzen
+
+Im Supabase-Dashboard unter *SQL Editor*:
+
+```sql
+truncate public.submissions restart identity;
+update public.session_state set discussion_open = false, reveal_open = false where id = 1;
+```
 
 ## Technik
 
