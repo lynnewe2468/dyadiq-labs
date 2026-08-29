@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Diskussion — DyadIQ Labs</title>
+<meta name="description" content="Interaktiver Diskussionsteil: Einordnen, Erklären, Verändern.">
+<meta name="theme-color" content="#050c12">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,500;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav" id="nav">
+  <a class="brand" href="index.html">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span class="brand-name">DyadIQ Labs</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Übersicht</a>
+    <a href="wissen.html">Wissen</a>
+    <a href="diskussion.html" aria-current="page">Diskussion</a>
+  </div>
+  <a class="btn btn-sm" href="wissen.html">Wissensbasis</a>
+</nav>
+
+<!-- Verbindungshinweis -->
+<div class="conn-banner is-hidden" id="conn-banner" role="status"></div>
+
+<!-- Moderationsleiste (nur mit ?presenter=CODE) -->
+<div class="presenter-bar is-hidden" id="presenter-bar">
+  <span class="presenter-tag">Moderation</span>
+  <button class="pbtn" id="toggle-discussion" type="button">Diskussion freischalten</button>
+  <button class="pbtn" id="toggle-reveal" type="button">Auflösung freischalten</button>
+  <span class="presenter-count" id="presenter-count">–</span>
+</div>
+
+<main>
+
+  <!-- GESPERRT -->
+  <section class="locked" id="locked-screen">
+    <div class="locked-inner">
+      <span class="lock-icon" aria-hidden="true">◆</span>
+      <h1>Der Diskussionsteil ist noch geschlossen</h1>
+      <p>Dieser Bereich wird während der Präsentation freigeschaltet. Bis dahin kannst du dich schon einmal in die Grundlagen einlesen.</p>
+      <a class="btn btn-lg" href="wissen.html">Zur Wissensbasis</a>
+    </div>
+  </section>
+
+  <!-- INHALT -->
+  <div class="is-hidden" id="discussion-content">
+
+    <!-- KOPF -->
+    <header class="page-head">
+      <div class="blob blob-a" aria-hidden="true"></div>
+      <div class="page-head-inner">
+        <span class="kicker">Publikumsaufgabe</span>
+        <h1 class="page-title">Due Diligence<br><span class="page-title-em">in drei Schritten.</span></h1>
+        <p class="page-lede">Ihr prüft einen echten DyadIQ-Bericht: Was kann das Tool belegen — und wo behauptet es mehr, als die Forschung hergibt?</p>
+      </div>
+    </header>
+
+    <!-- AUSGANGSLAGE -->
+    <section class="stage">
+      <div class="stage-inner reveal">
+        <span class="kicker kicker-sm">Ausgangslage</span>
+        <h2>Vor dem Start lesen</h2>
+        <div class="stage-grid">
+          <div class="stage-person">
+            <span class="person-role">Führungskraft</span>
+            <span class="person-name">Nora</span>
+            <p>Öffnet DyadIQ, um zu sehen, wie ihr Mitarbeiter Paul sie eingeschätzt hat.</p>
+          </div>
+          <div class="stage-arrow" aria-hidden="true">bewertet</div>
+          <div class="stage-person">
+            <span class="person-role">Mitarbeiter</span>
+            <span class="person-name">Paul</span>
+            <p>Hat die Befragung ausgefüllt. Seine Angaben bilden den Bericht.</p>
+          </div>
+        </div>
+        <ul class="stage-legend">
+          <li><span class="lg lg-e">E</span> Pauls Erwartung an eine <strong>ideale</strong> Führungskraft</li>
+          <li><span class="lg lg-w">W</span> Wie er <strong>Nora tatsächlich</strong> wahrnimmt</li>
+          <li><span class="lg lg-l">LMX</span> Pauls Bewertung der gemeinsamen Arbeitsbeziehung</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- DER BERICHT -->
+    <section class="report-section" id="bericht">
+      <div class="report reveal">
+        <div class="report-chrome">
+          <span class="report-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="report-title">DyadIQ&nbsp;· Beziehungsbericht</span>
+          <span class="report-badge">Testversion</span>
+        </div>
+
+        <div class="report-body">
+          <div class="report-head">
+            <div>
+              <span class="report-label">Dyade</span>
+              <h3>Nora &nbsp;&larr;&rarr;&nbsp; Paul</h3>
+            </div>
+            <div class="lmx-box">
+              <span class="report-label">Pauls LMX-Einschätzung</span>
+              <div class="lmx-value"><strong>2</strong><span>/ 7</span><em>niedrig</em></div>
+            </div>
+          </div>
+
+          <!-- Prototypen -->
+          <div class="metric-block">
+            <div class="metric-head">
+              <h4>Prototyp-Merkmale <span class="metric-hint">positiv</span></h4>
+              <span class="verdict verdict-warn">Diskrepanz</span>
+            </div>
+            <div class="metric" data-max="10">
+              <span class="metric-name">Intelligenz</span>
+              <div class="bars"><div class="bar bar-e" style="--v:8"><span>E 8</span></div><div class="bar bar-w" style="--v:6"><span>W 6</span></div></div>
+            </div>
+            <div class="metric" data-max="10">
+              <span class="metric-name">Engagement</span>
+              <div class="bars"><div class="bar bar-e" style="--v:6"><span>E 6</span></div><div class="bar bar-w" style="--v:4"><span>W 4</span></div></div>
+            </div>
+            <div class="metric metric-avg" data-max="10">
+              <span class="metric-name">Durchschnitt</span>
+              <div class="bars"><div class="bar bar-e" style="--v:7"><span>E 7,0</span></div><div class="bar bar-w" style="--v:5"><span>W 5,0</span></div></div>
+            </div>
+          </div>
+
+          <!-- Antiprototypen -->
+          <div class="metric-block">
+            <div class="metric-head">
+              <h4>Antiprototyp-Merkmale <span class="metric-hint">negativ</span></h4>
+              <span class="verdict verdict-warn">Diskrepanz</span>
+            </div>
+            <div class="metric" data-max="10">
+              <span class="metric-name">Maskulinität</span>
+              <div class="bars"><div class="bar bar-e" style="--v:2"><span>E 2</span></div><div class="bar bar-w" style="--v:5"><span>W 5</span></div></div>
+            </div>
+            <div class="metric" data-max="10">
+              <span class="metric-name">Tyrannei</span>
+              <div class="bars"><div class="bar bar-e" style="--v:3"><span>E 3</span></div><div class="bar bar-w" style="--v:4"><span>W 4</span></div></div>
+            </div>
+            <div class="metric metric-avg" data-max="10">
+              <span class="metric-name">Durchschnitt</span>
+              <div class="bars"><div class="bar bar-e" style="--v:2.5"><span>E 2,5</span></div><div class="bar bar-w" style="--v:4.5"><span>W 4,5</span></div></div>
+            </div>
+          </div>
+
+          <p class="report-upsell">Testversion: Es werden nur zwei von mehreren Merkmalen je Kategorie gezeigt. Vollständiges Profil nur mit Upgrade.</p>
+
+          <!-- DyadIQ-Ausgaben -->
+          <div class="output">
+            <span class="output-label">Erklärung</span>
+            <p>Pauls niedrige Bewertung der Arbeitsbeziehung ist auf die festgestellte Diskrepanz bei den positiven Merkmalen zurückzuführen: Er nimmt Intelligenz und Engagement bei Nora deutlich schwächer wahr, als er es von einer Führungskraft erwartet.</p>
+          </div>
+
+          <div class="output output-action">
+            <span class="output-label">Handlungsempfehlung für Ihre Führung</span>
+            <p>Erhöhen Sie Ihr wahrgenommenes <strong>Engagement</strong> und Ihre wahrgenommene <strong>Intelligenz</strong> gegenüber Paul, um näher an sein Erwartungsprofil heranzukommen. Zielkorridor: Angleichung von W an E im Prototyp-Bereich.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUFGABEN -->
+    <section class="tasks" id="aufgaben">
+      <div class="tasks-inner">
+
+        <div class="tasks-intro reveal">
+          <span class="kicker">Drei Aufgaben</span>
+          <h2>Einordnen · Erklären · Verändern</h2>
+          <p>Bearbeitet die Aufgabe eurer Gruppe. Mehrere Gruppen können dieselbe Aufgabe bearbeiten.</p>
+        </div>
+
+        <!-- AUFGABE 1 -->
+        <article class="task reveal" id="aufgabe-1">
+          <header class="task-head">
+            <span class="task-num">01</span>
+            <div>
+              <h3>Einordnen</h3>
+              <p class="task-sub">Was kann das Tool methodisch — und was sagen die Zahlen noch nicht?</p>
+            </div>
+          </header>
+
+          <div class="task-material">
+            <span class="material-label">Material</span>
+            <p>Der Bericht oben, plus die <a href="wissen.html#matrix">Konstellationsmatrix</a> aus der Wissensbasis als Beleg — ausdrücklich als <strong>Orientierungshilfe</strong>, nicht als Diagnosesystem.</p>
+          </div>
+
+          <form class="task-form" data-task="1" novalidate>
+            <div class="field">
+              <label for="t1-q1">1 — Was macht DyadIQ hier methodisch besser als zwei der drei echten Studien?</label>
+              <textarea id="t1-q1" name="q1" rows="4" required placeholder="Eure Antwort …"></textarea>
+            </div>
+            <div class="field">
+              <label for="t1-q2">2 — Sind die gezeigten Zahlen damit schon die Wahrheit über Nora?</label>
+              <textarea id="t1-q2" name="q2" rows="4" required placeholder="Eure Antwort …"></textarea>
+            </div>
+            <div class="field">
+              <label for="t1-key">Gemeinsame Kernaussage <span class="req">wird für alle sichtbar</span></label>
+              <textarea id="t1-key" name="key" rows="2" required maxlength="400" placeholder="In einem Satz …"></textarea>
+            </div>
+            <div class="form-foot">
+              <input class="group-input" type="text" name="group" required maxlength="60" placeholder="Gruppenname, z. B. Gruppe 2" aria-label="Gruppenname">
+              <button class="btn btn-md" type="submit">Abgeben</button>
+              <span class="form-status" role="status"></span>
+            </div>
+          </form>
+        </article>
+
+        <!-- AUFGABE 2 -->
+        <article class="task reveal" id="aufgabe-2">
+          <header class="task-head">
+            <span class="task-num">02</span>
+            <div>
+              <h3>Erklären</h3>
+              <p class="task-sub">Welche Aussage trägt die Datenlage — und welche nicht?</p>
+            </div>
+          </header>
+
+          <div class="task-material">
+            <span class="material-label">Material</span>
+            <p>Drei vorgegebene Aussagen. Ordnet jede ein und begründet kurz.</p>
+          </div>
+
+          <form class="task-form" data-task="2" novalidate>
+            <div class="claim">
+              <p class="claim-text"><span class="claim-num">A</span>„Die vorliegende Konstellation kann mit Pauls LMX-Bewertung zusammenhängen."</p>
+              <div class="radios" role="radiogroup" aria-label="Einordnung Aussage A">
+                <label><input type="radio" name="a1" value="gestützt" required><span>gestützt</span></label>
+                <label><input type="radio" name="a1" value="eingeschränkt gestützt"><span>eingeschränkt gestützt</span></label>
+                <label><input type="radio" name="a1" value="nicht gestützt"><span>nicht gestützt</span></label>
+              </div>
+              <textarea name="b1" rows="2" required placeholder="Begründung …"></textarea>
+            </div>
+
+            <div class="claim">
+              <p class="claim-text"><span class="claim-num">B</span>„Die Diskrepanz verursacht Pauls niedrige LMX-Bewertung."</p>
+              <div class="radios" role="radiogroup" aria-label="Einordnung Aussage B">
+                <label><input type="radio" name="a2" value="gestützt" required><span>gestützt</span></label>
+                <label><input type="radio" name="a2" value="eingeschränkt gestützt"><span>eingeschränkt gestützt</span></label>
+                <label><input type="radio" name="a2" value="nicht gestützt"><span>nicht gestützt</span></label>
+              </div>
+              <textarea name="b2" rows="2" required placeholder="Begründung …"></textarea>
+            </div>
+
+            <div class="claim">
+              <p class="claim-text"><span class="claim-num">C</span>„Nora ist die Ursache des Beziehungsproblems."</p>
+              <div class="radios" role="radiogroup" aria-label="Einordnung Aussage C">
+                <label><input type="radio" name="a3" value="gestützt" required><span>gestützt</span></label>
+                <label><input type="radio" name="a3" value="eingeschränkt gestützt"><span>eingeschränkt gestützt</span></label>
+                <label><input type="radio" name="a3" value="nicht gestützt"><span>nicht gestützt</span></label>
+              </div>
+              <textarea name="b3" rows="2" required placeholder="Begründung …"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="t2-key">Gemeinsame Kernaussage <span class="req">wird für alle sichtbar</span></label>
+              <textarea id="t2-key" name="key" rows="2" required maxlength="400" placeholder="In einem Satz …"></textarea>
+            </div>
+            <div class="form-foot">
+              <input class="group-input" type="text" name="group" required maxlength="60" placeholder="Gruppenname, z. B. Gruppe 2" aria-label="Gruppenname">
+              <button class="btn btn-md" type="submit">Abgeben</button>
+              <span class="form-status" role="status"></span>
+            </div>
+          </form>
+        </article>
+
+        <!-- AUFGABE 3 -->
+        <article class="task reveal" id="aufgabe-3">
+          <header class="task-head">
+            <span class="task-num">03</span>
+            <div>
+              <h3>Verändern</h3>
+              <p class="task-sub">Ist die Handlungsempfehlung gedeckt — und was ginge stattdessen?</p>
+            </div>
+          </header>
+
+          <div class="task-material">
+            <span class="material-label">Material</span>
+            <p>Die <strong>Handlungsempfehlung</strong> aus dem Bericht oben. Kreuzt an, welche Einwände zutreffen.</p>
+          </div>
+
+          <form class="task-form" data-task="3" novalidate>
+            <div class="checks">
+              <label class="check"><input type="checkbox" name="e1" value="Unklar, ob E oder W der richtige Ansatzpunkt ist"><span>Es ist unklar, ob <strong>E oder W</strong> überhaupt der richtige Ansatzpunkt ist.</span></label>
+              <label class="check"><input type="checkbox" name="e2" value="Keine Studie hat eine Verhaltensänderung getestet"><span>Keine Studie hat eine <strong>Verhaltensänderung</strong> tatsächlich getestet.</span></label>
+              <label class="check"><input type="checkbox" name="e3" value="Pauls Erwartungswert wird nie hinterfragt"><span>Pauls <strong>Erwartungswert</strong> selbst wird nie hinterfragt.</span></label>
+            </div>
+
+            <div class="field">
+              <label for="t3-key">Formulierungsvorschlag — was dürfte DyadIQ stattdessen verantwortbar ausgeben? <span class="req">wird für alle sichtbar</span></label>
+              <textarea id="t3-key" name="key" rows="3" required maxlength="400" placeholder="Euer Vorschlag …"></textarea>
+            </div>
+            <div class="form-foot">
+              <input class="group-input" type="text" name="group" required maxlength="60" placeholder="Gruppenname, z. B. Gruppe 2" aria-label="Gruppenname">
+              <button class="btn btn-md" type="submit">Abgeben</button>
+              <span class="form-status" role="status"></span>
+            </div>
+          </form>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- GEMEINSAMES ERGEBNIS -->
+    <section class="results" id="ergebnis">
+      <div class="results-inner">
+        <div class="results-head">
+          <div>
+            <span class="kicker">Gemeinsames Ergebnis</span>
+            <h2>Was die Gruppen eingereicht haben</h2>
+          </div>
+          <span class="live-dot" id="live-dot" title="Aktualisiert sich automatisch">live</span>
+        </div>
+        <div class="results-grid" id="results-grid">
+          <div class="results-col" data-col="1"><h3><span class="task-num-sm">01</span> Einordnen</h3><div class="results-list" id="res-1"></div></div>
+          <div class="results-col" data-col="2"><h3><span class="task-num-sm">02</span> Erklären</h3><div class="results-list" id="res-2"></div></div>
+          <div class="results-col" data-col="3"><h3><span class="task-num-sm">03</span> Verändern</h3><div class="results-list" id="res-3"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABSCHLUSS-REVEAL -->
+    <section class="reveal-section" id="aufloesung">
+      <div class="reveal-inner">
+
+        <div class="reveal-locked" id="reveal-locked">
+          <span class="lock-icon" aria-hidden="true">◆</span>
+          <h2>Auflösung</h2>
+          <p>Wird nach der gemeinsamen Vorstellung der Gruppenergebnisse freigeschaltet.</p>
+        </div>
+
+        <div class="reveal-open is-hidden" id="reveal-open">
+          <span class="kicker">Auflösung</span>
+          <h2>Was DyadIQ hätte ausgeben dürfen</h2>
+
+          <div class="report report-clean">
+            <div class="report-chrome">
+              <span class="report-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="report-title">DyadIQ&nbsp;· Beziehungsbericht <em>(entschärft)</em></span>
+            </div>
+            <div class="report-body">
+              <div class="output output-clean">
+                <span class="output-label">Befund</span>
+                <p>Nora erwartet positive Führungsmerkmale stärker, als sie Paul bei ihr wahrnimmt, und Paul bewertet die Beziehung niedrig.</p>
+              </div>
+              <div class="output output-clean">
+                <span class="output-label">Grenzen der Aussage</span>
+                <p>Die Daten erlauben <strong>keine Aussage darüber</strong>, wodurch diese Konstellation entstanden ist oder wer sich verändern sollte.</p>
+              </div>
+              <div class="output output-clean">
+                <span class="output-label">Nächster Schritt</span>
+                <p>Vor einer Maßnahme sollten <strong>beide Perspektiven</strong> sowie die konkreten Erfahrungen hinter den Bewertungen geklärt werden.</p>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="solutions-title">Musterlösungen</h3>
+          <div class="solutions">
+            <article class="solution">
+              <span class="task-num-sm">01</span>
+              <h4>Einordnen</h4>
+              <p>DyadIQ lässt E und W <strong>getrennt stehen</strong>, statt sie wie Epitropaki/Martin und Hesmert/Vogel zu einem einzigen Differenzwert zu verrechnen — dadurch gehen Niveau und Richtung nicht verloren. Das ist methodisch sauberer.</p>
+              <p>Trotzdem sind die Werte selbst <strong>zweifach subjektiv</strong>: W ist Pauls Zuschreibung, keine objektive Eigenschaft Noras. Und E ist trotz sauberer Trennung nur eine bewusste Selbstauskunft über ein eigentlich unbewusstes Bild — kein direkter Zugriff auf ein implizites Schema.</p>
+            </article>
+            <article class="solution">
+              <span class="task-num-sm">02</span>
+              <h4>Erklären</h4>
+              <ul>
+                <li><strong>A — gestützt.</strong> Die drei Studien zeigen tatsächlich einen statistischen Zusammenhang.</li>
+                <li><strong>B — nicht bzw. nur eingeschränkt gestützt.</strong> Kein Studiendesign beweist Kausalität, selbst das Längsschnittdesign von Epitropaki und Martin nicht, da keine experimentelle Veränderung stattfand.</li>
+                <li><strong>C — nicht gestützt.</strong> Die Daten sind Pauls subjektive Zuschreibung, keine objektive Beschreibung von Noras Verhalten oder Persönlichkeit.</li>
+              </ul>
+            </article>
+            <article class="solution">
+              <span class="task-num-sm">03</span>
+              <h4>Verändern</h4>
+              <p>Die Empfehlung ist <strong>nicht gedeckt</strong>: Keine der drei Studien hat getestet, ob eine gezielte Verhaltensänderung bei der Führungskraft die LMX-Qualität tatsächlich verbessert. Zudem wird unhinterfragt vorausgesetzt, dass Pauls Erwartungswert der richtige Maßstab ist.</p>
+              <p>Verantwortbar wäre höchstens, die Diskrepanz zu <strong>benennen</strong> und ein <strong>Gespräch</strong> über die dahinterliegenden Erfahrungen beider Seiten vorzuschlagen — statt eine konkrete Verhaltensänderung vorzuschreiben.</p>
+            </article>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="brand brand-sm">
+    <span class="brand-mark brand-mark-sm" aria-hidden="true"></span>
+    <span>DyadIQ Labs</span>
+  </div>
+  <div class="footer-links">
+    <a href="index.html">Übersicht</a>
+    <a href="wissen.html">Wissen</a>
+    <a href="diskussion.html">Diskussion</a>
+  </div>
+  <span>&copy; 2026 DyadIQ Labs</span>
+</footer>
+
+<script src="config.js"></script>
+<script src="script.js"></script>
+<script src="diskussion.js"></script>
+</body>
+</html>

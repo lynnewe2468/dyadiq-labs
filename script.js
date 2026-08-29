@@ -97,3 +97,36 @@
     });
   }
 })();
+
+/* ============================================================
+   Tabs (Konstellationsmatrix auf der Wissensseite)
+   ============================================================ */
+(function () {
+  'use strict';
+  var tablist = document.querySelector('.tabs[role="tablist"]');
+  if (!tablist) return;
+
+  var tabs = Array.prototype.slice.call(tablist.querySelectorAll('.tab'));
+
+  function select(tab) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', String(on));
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if (panel) panel.classList.toggle('is-hidden', !on);
+    });
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { select(tab); });
+    tab.addEventListener('keydown', function (e) {
+      var dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!dir) return;
+      e.preventDefault();
+      var next = tabs[(i + dir + tabs.length) % tabs.length];
+      next.focus();
+      select(next);
+    });
+  });
+})();
