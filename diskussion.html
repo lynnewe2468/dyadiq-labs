@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
-<title>Diskussion — DyadIQ Labs</title>
-<meta name="description" content="Interaktiver Diskussionsteil: Einordnen, Erklären, Verändern.">
+<title>Demo — DyadIQ Labs</title>
+<meta name="description" content="Demo-Version mit Beispielszenario: Einordnen, Erklären, Verändern.">
 <meta name="theme-color" content="#050c12">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,7 @@
   <div class="nav-links">
     <a href="index.html">Übersicht</a>
     <a href="wissen.html">Wissen</a>
-    <a href="diskussion.html" aria-current="page">Diskussion</a>
+    <a href="diskussion.html" aria-current="page">Demo</a>
   </div>
   <a class="btn btn-sm" href="wissen.html">Wissensbasis</a>
 </nav>
@@ -36,8 +36,9 @@
 <!-- Moderationsleiste (nur mit ?presenter=CODE) -->
 <div class="presenter-bar is-hidden" id="presenter-bar">
   <span class="presenter-tag">Moderation</span>
-  <button class="pbtn" id="toggle-discussion" type="button">Diskussion freischalten</button>
+  <button class="pbtn" id="toggle-discussion" type="button">Demo freischalten</button>
   <button class="pbtn" id="toggle-reveal" type="button">Auflösung freischalten</button>
+  <button class="pbtn pbtn-danger" id="clear-all" type="button">Alle Abgaben löschen</button>
   <span class="presenter-count" id="presenter-count">–</span>
 </div>
 
@@ -47,7 +48,7 @@
   <section class="locked" id="locked-screen">
     <div class="locked-inner">
       <span class="lock-icon" aria-hidden="true">◆</span>
-      <h1>Der Diskussionsteil ist noch geschlossen</h1>
+      <h1>Die Demo ist noch geschlossen</h1>
       <p>Dieser Bereich wird während der Präsentation freigeschaltet. Bis dahin kannst du dich schon einmal in die Grundlagen einlesen.</p>
       <a class="btn btn-lg" href="wissen.html">Zur Wissensbasis</a>
     </div>
@@ -60,9 +61,9 @@
     <header class="page-head">
       <div class="blob blob-a" aria-hidden="true"></div>
       <div class="page-head-inner">
-        <span class="kicker">Publikumsaufgabe</span>
-        <h1 class="page-title">Due Diligence<br><span class="page-title-em">in drei Schritten.</span></h1>
-        <p class="page-lede">Ihr prüft einen echten DyadIQ-Bericht: Was kann das Tool belegen — und wo behauptet es mehr, als die Forschung hergibt?</p>
+        <span class="kicker">Demo-Version</span>
+        <h1 class="page-title">Willkommen bei<br><span class="page-title-em">unserer Demo.</span></h1>
+        <p class="page-lede">Schön, dass ihr DyadIQ testen möchtet! Hier bekommt ihr ein Beispielszenario, an dem ihr die Funktionen des Tools in Ruhe ausprobieren könnt.</p>
       </div>
     </header>
 
@@ -77,7 +78,6 @@
             <span class="person-name">Nora</span>
             <p>Öffnet DyadIQ, um zu sehen, wie ihr Mitarbeiter Paul sie eingeschätzt hat.</p>
           </div>
-          <div class="stage-arrow" aria-hidden="true">bewertet</div>
           <div class="stage-person">
             <span class="person-role">Mitarbeiter</span>
             <span class="person-name">Paul</span>
@@ -85,8 +85,8 @@
           </div>
         </div>
         <ul class="stage-legend">
-          <li><span class="lg lg-e">E</span> Pauls Erwartung an eine <strong>ideale</strong> Führungskraft</li>
-          <li><span class="lg lg-w">W</span> Wie er <strong>Nora tatsächlich</strong> wahrnimmt</li>
+          <li><span class="lg lg-e">E</span> Pauls <strong>Erwartung</strong> an eine Führungskraft</li>
+          <li><span class="lg lg-w">W</span> Pauls tatsächliche <strong>Wahrnehmung</strong> von Nora</li>
           <li><span class="lg lg-l">LMX</span> Pauls Bewertung der gemeinsamen Arbeitsbeziehung</li>
         </ul>
       </div>
@@ -109,7 +109,7 @@
             </div>
             <div class="lmx-box">
               <span class="report-label">Pauls LMX-Einschätzung</span>
-              <div class="lmx-value"><strong>2</strong><span>/ 7</span><em>niedrig</em></div>
+              <div class="lmx-value"><strong>2,0</strong><span>/ 7,0</span><em>niedrig</em></div>
             </div>
           </div>
 
@@ -121,11 +121,11 @@
             </div>
             <div class="metric" data-max="10">
               <span class="metric-name">Intelligenz</span>
-              <div class="bars"><div class="bar bar-e" style="--v:8"><span>E 8</span></div><div class="bar bar-w" style="--v:6"><span>W 6</span></div></div>
+              <div class="bars"><div class="bar bar-e" style="--v:8"><span>E 8,0</span></div><div class="bar bar-w" style="--v:6"><span>W 6,0</span></div></div>
             </div>
             <div class="metric" data-max="10">
               <span class="metric-name">Engagement</span>
-              <div class="bars"><div class="bar bar-e" style="--v:6"><span>E 6</span></div><div class="bar bar-w" style="--v:4"><span>W 4</span></div></div>
+              <div class="bars"><div class="bar bar-e" style="--v:6"><span>E 6,0</span></div><div class="bar bar-w" style="--v:4"><span>W 4,0</span></div></div>
             </div>
             <div class="metric metric-avg" data-max="10">
               <span class="metric-name">Durchschnitt</span>
@@ -141,11 +141,11 @@
             </div>
             <div class="metric" data-max="10">
               <span class="metric-name">Maskulinität</span>
-              <div class="bars"><div class="bar bar-e" style="--v:2"><span>E 2</span></div><div class="bar bar-w" style="--v:5"><span>W 5</span></div></div>
+              <div class="bars"><div class="bar bar-e" style="--v:2"><span>E 2,0</span></div><div class="bar bar-w" style="--v:5"><span>W 5,0</span></div></div>
             </div>
             <div class="metric" data-max="10">
               <span class="metric-name">Tyrannei</span>
-              <div class="bars"><div class="bar bar-e" style="--v:3"><span>E 3</span></div><div class="bar bar-w" style="--v:4"><span>W 4</span></div></div>
+              <div class="bars"><div class="bar bar-e" style="--v:3"><span>E 3,0</span></div><div class="bar bar-w" style="--v:4"><span>W 4,0</span></div></div>
             </div>
             <div class="metric metric-avg" data-max="10">
               <span class="metric-name">Durchschnitt</span>
@@ -163,7 +163,7 @@
 
           <div class="output output-action">
             <span class="output-label">Handlungsempfehlung für Ihre Führung</span>
-            <p>Erhöhen Sie Ihr wahrgenommenes <strong>Engagement</strong> und Ihre wahrgenommene <strong>Intelligenz</strong> gegenüber Paul, um näher an sein Erwartungsprofil heranzukommen. Zielkorridor: Angleichung von W an E im Prototyp-Bereich.</p>
+            <p>Erhöhen Sie Ihr wahrgenommenes <strong>Engagement</strong> und Ihre wahrgenommene <strong>Intelligenz</strong> gegenüber Paul, um näher an sein Erwartungsprofil heranzukommen. Ziel: Angleichung von W an E im Prototyp-Bereich.</p>
           </div>
         </div>
       </div>
@@ -176,7 +176,11 @@
         <div class="tasks-intro reveal">
           <span class="kicker">Drei Aufgaben</span>
           <h2>Einordnen · Erklären · Verändern</h2>
-          <p>Bearbeitet die Aufgabe eurer Gruppe. Mehrere Gruppen können dieselbe Aufgabe bearbeiten.</p>
+        </div>
+
+        <div class="notice notice-first reveal">
+          <span class="notice-icon" aria-hidden="true">↑</span>
+          <p><strong>Erst das Szenario, dann die Aufgaben.</strong> Ohne die Ausgangslage und den Bericht darüber lassen sich die Fragen nicht beantworten. <a href="#bericht">Zurück zum Bericht</a></p>
         </div>
 
         <!-- AUFGABE 1 -->
@@ -204,9 +208,10 @@
               <textarea id="t1-q2" name="q2" rows="4" required placeholder="Eure Antwort …"></textarea>
             </div>
             <div class="field">
-              <label for="t1-key">Gemeinsame Kernaussage <span class="req">wird für alle sichtbar</span></label>
-              <textarea id="t1-key" name="key" rows="2" required maxlength="400" placeholder="In einem Satz …"></textarea>
+              <label for="t1-key">Fasst eure zentrale Erkenntnis in einem Satz zusammen <span class="req">wird für alle sichtbar</span></label>
+              <textarea id="t1-key" name="key" rows="2" required maxlength="400" placeholder="Was nehmt ihr aus dieser Aufgabe mit? …"></textarea>
             </div>
+            <p class="submit-warning">Prüft eure Antwort vor dem Abgeben &ndash; einmal abgeschickt, lässt sie sich nicht mehr ändern.</p>
             <div class="form-foot">
               <input class="group-input" type="text" name="group" required maxlength="60" placeholder="Gruppenname, z. B. Gruppe 2" aria-label="Gruppenname">
               <button class="btn btn-md" type="submit">Abgeben</button>
@@ -262,9 +267,10 @@
             </div>
 
             <div class="field">
-              <label for="t2-key">Gemeinsame Kernaussage <span class="req">wird für alle sichtbar</span></label>
-              <textarea id="t2-key" name="key" rows="2" required maxlength="400" placeholder="In einem Satz …"></textarea>
+              <label for="t2-key">Fasst eure zentrale Erkenntnis in einem Satz zusammen <span class="req">wird für alle sichtbar</span></label>
+              <textarea id="t2-key" name="key" rows="2" required maxlength="400" placeholder="Was nehmt ihr aus dieser Aufgabe mit? …"></textarea>
             </div>
+            <p class="submit-warning">Prüft eure Antwort vor dem Abgeben &ndash; einmal abgeschickt, lässt sie sich nicht mehr ändern.</p>
             <div class="form-foot">
               <input class="group-input" type="text" name="group" required maxlength="60" placeholder="Gruppenname, z. B. Gruppe 2" aria-label="Gruppenname">
               <button class="btn btn-md" type="submit">Abgeben</button>
@@ -299,6 +305,7 @@
               <label for="t3-key">Formulierungsvorschlag — was dürfte DyadIQ stattdessen verantwortbar ausgeben? <span class="req">wird für alle sichtbar</span></label>
               <textarea id="t3-key" name="key" rows="3" required maxlength="400" placeholder="Euer Vorschlag …"></textarea>
             </div>
+            <p class="submit-warning">Prüft eure Antwort vor dem Abgeben &ndash; einmal abgeschickt, lässt sie sich nicht mehr ändern.</p>
             <div class="form-foot">
               <input class="group-input" type="text" name="group" required maxlength="60" placeholder="Gruppenname, z. B. Gruppe 2" aria-label="Gruppenname">
               <button class="btn btn-md" type="submit">Abgeben</button>
@@ -403,7 +410,7 @@
   <div class="footer-links">
     <a href="index.html">Übersicht</a>
     <a href="wissen.html">Wissen</a>
-    <a href="diskussion.html">Diskussion</a>
+    <a href="diskussion.html">Demo</a>
   </div>
   <span>&copy; 2026 DyadIQ Labs</span>
 </footer>

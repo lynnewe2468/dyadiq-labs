@@ -1,7 +1,12 @@
 /* ============================================================
-   DyadIQ — Diskussionsteil
+   DyadIQ — Demo-Teil
    Speicher: Supabase (REST, ohne SDK). Ohne Konfiguration fällt
    die Seite auf localStorage zurück, damit sie testbar bleibt.
+
+   Lokal im Browser gemerkt werden ausserdem:
+   - Entwürfe der Formulare (überleben Seitenwechsel)
+   - welche Aufgabe bereits abgegeben wurde (inkl. Abgabe-ID,
+     damit der Stand zurückfällt, wenn die Moderation löscht)
    ============================================================ */
 (function () {
   'use strict';
@@ -9,6 +14,8 @@
   var CFG = window.DYADIQ_CONFIG || {};
   var HAS_REMOTE = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
   var POLL_MS = 4000;
+  var DRAFT_KEY = 'dyadiq.draft.';
+  var SENT_KEY = 'dyadiq.sent.';
 
   /* ---------- Hilfsfunktionen ---------- */
   function esc(s) {
@@ -22,6 +29,9 @@
     var d = new Date(iso);
     return isNaN(d) ? '' : d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
   }
+  function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
 
   /* ---------- Speicher-Schicht ---------- */
   var remote = {
@@ -55,9 +65,22 @@
     add: function (rec) {
       return fetch(this.url('submissions'), {
         method: 'POST',
-        headers: this.headers({ Prefer: 'return=minimal' }),
+        headers: this.headers({ Prefer: 'return=representation' }),
         body: JSON.stringify(rec)
-      }).then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error(t || ('add ' + r.status)); }); });
+      }).then(function (r) {
+        if (!r.ok) return r.text().then(function (t) { throw new Error(t || ('add ' + r.status)); });
+        return r.json();
+      }).then(function (rows) { return (rows && rows[0]) || null; });
+    },
+    remove: function (id) {
+      return fetch(this.url('submissions?id=eq.' + encodeURIComponent(id)), {
+        method: 'DELETE', headers: this.headers({ Prefer: 'return=minimal' })
+      }).then(function (r) { if (!r.ok) throw new Error('delete ' + r.status); });
+    },
+    clear: function () {
+      return fetch(this.url('submissions?id=gt.0'), {
+        method: 'DELETE', headers: this.headers({ Prefer: 'return=minimal' })
+      }).then(function (r) { if (!r.ok) throw new Error('clear ' + r.status); });
     }
   };
 
@@ -65,28 +88,32 @@
   var local = {
     getState: function () {
       return Promise.resolve({
-        discussion_open: localStorage.getItem(LK + 'discussion') === '1',
-        reveal_open: localStorage.getItem(LK + 'reveal') === '1'
+        discussion_open: ls(LK + 'discussion') === '1',
+        reveal_open: ls(LK + 'reveal') === '1'
       });
     },
     setState: function (patch) {
-      if ('discussion_open' in patch) localStorage.setItem(LK + 'discussion', patch.discussion_open ? '1' : '0');
-      if ('reveal_open' in patch) localStorage.setItem(LK + 'reveal', patch.reveal_open ? '1' : '0');
+      if ('discussion_open' in patch) lsSet(LK + 'discussion', patch.discussion_open ? '1' : '0');
+      if ('reveal_open' in patch) lsSet(LK + 'reveal', patch.reveal_open ? '1' : '0');
       return Promise.resolve();
     },
-    list: function () {
-      try { return Promise.resolve(JSON.parse(localStorage.getItem(LK + 'subs') || '[]')); }
-      catch (e) { return Promise.resolve([]); }
+    _rows: function () {
+      try { return JSON.parse(ls(LK + 'subs') || '[]'); } catch (e) { return []; }
     },
+    list: function () { return Promise.resolve(this._rows()); },
     add: function (rec) {
-      var self = this;
-      return this.list().then(function (rows) {
-        rec.id = rows.length + 1;
-        rec.created_at = new Date().toISOString();
-        rows.push(rec);
-        localStorage.setItem(LK + 'subs', JSON.stringify(rows));
-      });
-    }
+      var rows = this._rows();
+      rec.id = (rows.length ? rows[rows.length - 1].id : 0) + 1;
+      rec.created_at = new Date().toISOString();
+      rows.push(rec);
+      lsSet(LK + 'subs', JSON.stringify(rows));
+      return Promise.resolve(rec);
+    },
+    remove: function (id) {
+      lsSet(LK + 'subs', JSON.stringify(this._rows().filter(function (r) { return r.id !== id; })));
+      return Promise.resolve();
+    },
+    clear: function () { lsSet(LK + 'subs', '[]'); return Promise.resolve(); }
   };
 
   var store = HAS_REMOTE ? remote : local;
@@ -107,6 +134,65 @@
     setBanner('Testmodus — keine Datenbank verbunden. Eingaben bleiben nur in diesem Browser.', 'warn');
   }
 
+  /* ============================================================
+     Entwürfe: Formularinhalte überleben den Seitenwechsel
+     ============================================================ */
+  function formFields(form) {
+    return Array.prototype.filter.call(form.elements, function (el) { return el.name; });
+  }
+
+  function readForm(form) {
+    var out = { _radio: {}, _check: {}, _text: {} };
+    formFields(form).forEach(function (el) {
+      if (el.type === 'radio') { if (el.checked) out._radio[el.name] = el.value; }
+      else if (el.type === 'checkbox') { out._check[el.name] = el.checked; }
+      else { out._text[el.name] = el.value; }
+    });
+    return out;
+  }
+
+  function writeForm(form, data) {
+    if (!data) return false;
+    var touched = false;
+    formFields(form).forEach(function (el) {
+      if (el.type === 'radio') {
+        if (data._radio && data._radio[el.name] === el.value) { el.checked = true; touched = true; }
+      } else if (el.type === 'checkbox') {
+        if (data._check && data._check[el.name]) { el.checked = true; touched = true; }
+      } else if (data._text && typeof data._text[el.name] === 'string' && data._text[el.name]) {
+        el.value = data._text[el.name]; touched = true;
+      }
+    });
+    return touched;
+  }
+
+  function saveDraft(form) {
+    try { lsSet(DRAFT_KEY + form.dataset.task, JSON.stringify(readForm(form))); } catch (e) {}
+  }
+  function loadDraft(form) {
+    try { return JSON.parse(ls(DRAFT_KEY + form.dataset.task) || 'null'); } catch (e) { return null; }
+  }
+
+  /* ============================================================
+     Abgabe-Status: bleibt erhalten, fällt aber zurück, wenn die
+     Moderation die Abgabe wieder löscht
+     ============================================================ */
+  function markSubmitted(form, on, text) {
+    var status = form.querySelector('.form-status');
+    var button = form.querySelector('button[type="submit"]');
+    form.classList.toggle('is-submitted', on);
+    if (button) button.disabled = on;
+    if (status) {
+      status.textContent = on ? (text || 'Bereits abgegeben.') : '';
+      status.className = 'form-status' + (on ? ' is-ok' : '');
+    }
+  }
+
+  function sentId(task) {
+    var v = ls(SENT_KEY + task);
+    return v === null ? null : Number(v);
+  }
+
   /* ---------- Zustand rendern ---------- */
   var state = { discussion_open: false, reveal_open: false };
   var lastSubsJSON = '';
@@ -120,7 +206,7 @@
 
     var td = $('toggle-discussion'), tr = $('toggle-reveal');
     if (td) {
-      td.textContent = state.discussion_open ? 'Diskussion schließen' : 'Diskussion freischalten';
+      td.textContent = state.discussion_open ? 'Demo schließen' : 'Demo freischalten';
       td.classList.toggle('is-on', state.discussion_open);
     }
     if (tr) {
@@ -130,7 +216,21 @@
   }
 
   function renderSubs(rows) {
-    var json = JSON.stringify(rows);
+    // Abgabe-Status gegen die tatsächlich vorhandenen Zeilen abgleichen
+    var ids = {};
+    rows.forEach(function (r) { ids[Number(r.id)] = true; });
+    Array.prototype.forEach.call(document.querySelectorAll('.task-form'), function (form) {
+      var id = sentId(form.dataset.task);
+      if (id === null) return;
+      if (ids[id]) {
+        if (!form.classList.contains('is-submitted')) markSubmitted(form, true);
+      } else {
+        lsDel(SENT_KEY + form.dataset.task);
+        markSubmitted(form, false);
+      }
+    });
+
+    var json = JSON.stringify(rows) + '|' + isPresenter;
     if (json === lastSubsJSON) return;
     lastSubsJSON = json;
 
@@ -150,9 +250,12 @@
               return '<dt>' + esc(k) + '</dt><dd>' + esc(r.answers[k]) + '</dd>';
             }).join('') + '</dl></details>';
         }
+        var del = isPresenter
+          ? '<button class="res-del" type="button" data-del="' + esc(r.id) + '" title="Diese Abgabe löschen" aria-label="Abgabe von ' + esc(r.group_name) + ' löschen">&times;</button>'
+          : '';
         return '<article class="res-card">' +
           '<header><span class="res-group">' + esc(r.group_name) + '</span>' +
-          '<span class="res-time">' + esc(timeOf(r.created_at)) + '</span></header>' +
+          '<span class="res-time">' + esc(timeOf(r.created_at)) + '</span>' + del + '</header>' +
           '<p>' + esc(r.key_statement) + '</p>' + details + '</article>';
       }).join('');
     });
@@ -164,7 +267,7 @@
   /* ---------- Poll-Schleife ---------- */
   var failures = 0;
   function tick() {
-    Promise.all([store.getState(), store.list()])
+    return Promise.all([store.getState(), store.list()])
       .then(function (res) {
         failures = 0;
         if (HAS_REMOTE && banner && banner.classList.contains('conn-error')) setBanner('', '');
@@ -184,12 +287,31 @@
   if (isPresenter) {
     show($('presenter-bar'), true);
     document.body.classList.add('is-presenter');
-    var td = $('toggle-discussion'), tr = $('toggle-reveal');
+
+    var td = $('toggle-discussion'), tr = $('toggle-reveal'), ca = $('clear-all');
     if (td) td.addEventListener('click', function () {
-      store.setState({ discussion_open: !state.discussion_open }).then(tick).catch(function (e) { alert('Konnte nicht umschalten: ' + e.message); });
+      store.setState({ discussion_open: !state.discussion_open }).then(tick)
+        .catch(function (e) { alert('Konnte nicht umschalten: ' + e.message); });
     });
     if (tr) tr.addEventListener('click', function () {
-      store.setState({ reveal_open: !state.reveal_open }).then(tick).catch(function (e) { alert('Konnte nicht umschalten: ' + e.message); });
+      store.setState({ reveal_open: !state.reveal_open }).then(tick)
+        .catch(function (e) { alert('Konnte nicht umschalten: ' + e.message); });
+    });
+    if (ca) ca.addEventListener('click', function () {
+      if (!confirm('Wirklich ALLE Abgaben löschen? Das lässt sich nicht rückgängig machen.')) return;
+      store.clear().then(tick).catch(function (e) { alert('Löschen fehlgeschlagen: ' + e.message); });
+    });
+
+    // Einzelne Abgabe löschen (Delegation, weil neu gerendert wird)
+    var grid = $('results-grid');
+    if (grid) grid.addEventListener('click', function (e) {
+      var btn = e.target.closest && e.target.closest('[data-del]');
+      if (!btn) return;
+      if (!confirm('Diese Abgabe löschen?')) return;
+      btn.disabled = true;
+      store.remove(Number(btn.getAttribute('data-del')))
+        .then(function () { lastSubsJSON = ''; return tick(); })
+        .catch(function (err) { btn.disabled = false; alert('Löschen fehlgeschlagen: ' + err.message); });
     });
   }
 
@@ -197,6 +319,20 @@
   Array.prototype.forEach.call(document.querySelectorAll('.task-form'), function (form) {
     var status = form.querySelector('.form-status');
     var button = form.querySelector('button[type="submit"]');
+
+    // Entwurf wiederherstellen
+    var restored = writeForm(form, loadDraft(form));
+    if (restored && sentId(form.dataset.task) === null) {
+      var note = document.createElement('p');
+      note.className = 'draft-note';
+      note.textContent = 'Eure vorherigen Eingaben wurden wiederhergestellt.';
+      form.insertBefore(note, form.firstChild);
+    }
+    if (sentId(form.dataset.task) !== null) markSubmitted(form, true);
+
+    // Entwurf laufend sichern
+    form.addEventListener('input', function () { saveDraft(form); });
+    form.addEventListener('change', function () { saveDraft(form); });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -210,8 +346,8 @@
       var answers = {};
       data.forEach(function (v, k) {
         if (k === 'group' || k === 'key') return;
-        var s = String(v).trim();
-        if (s) answers[k] = answers[k] ? answers[k] + ' · ' + s : s;
+        var val = String(v).trim();
+        if (val) answers[k] = answers[k] ? answers[k] + ' · ' + val : val;
       });
 
       button.disabled = true;
@@ -223,10 +359,13 @@
         group_name: group.slice(0, 60),
         key_statement: key.slice(0, 400),
         answers: answers
-      }).then(function () {
-        status.textContent = 'Abgegeben — danke!';
-        status.className = 'form-status is-ok';
-        form.classList.add('is-submitted');
+      }).then(function (row) {
+        if (row && row.id != null) lsSet(SENT_KEY + form.dataset.task, String(row.id));
+        saveDraft(form);
+        markSubmitted(form, true, 'Abgegeben — danke!');
+        var n = form.querySelector('.draft-note');
+        if (n) n.remove();
+        lastSubsJSON = '';
         tick();
       }).catch(function (err) {
         button.disabled = false;

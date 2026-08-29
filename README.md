@@ -20,18 +20,24 @@ Beide zeigen auf die Übersichtsseite.
 | --- | --- |
 | `index.html` | **Übersicht** — die Produktseite, wie sie ein echtes HR-Tech-Startup hätte. Bewusst szenariofrei: kein Nora/Paul, kein Präsentationsbezug. |
 | `wissen.html` | **Wissensbasis** — ILT/IFT, Erwartungs- und Wahrnehmungswert, LMX, Konstellationsmatrix, Befundlage der drei Studien, offene Forschungslücken. |
-| `diskussion.html` | **Diskussion** — Ausgangslage, der DyadIQ-Bericht, drei Gruppenaufgaben, gemeinsam sichtbare Ergebnisse, Abschluss-Auflösung. |
+| `diskussion.html` | **Demo** — Ausgangslage, der DyadIQ-Bericht, drei Gruppenaufgaben, gemeinsam sichtbare Ergebnisse, Abschluss-Auflösung. |
 
 ## Ablauf am Präsentationstag
 
-1. Die Diskussionsseite ist zunächst **gesperrt**; Übersicht und Wissensbasis sind frei zugänglich.
+1. Die Demo-Seite ist zunächst **gesperrt**; Übersicht und Wissensbasis sind frei zugänglich.
 2. Moderationsansicht öffnen: `diskussion.html?presenter=CODE` (Code steht in `config.js`).
-3. **„Diskussion freischalten"** → alle Betrachter sehen die Aufgaben.
+3. **„Demo freischalten"** → alle Betrachter sehen die Aufgaben.
 4. Die Gruppen geben ab; die Kernaussagen erscheinen bei allen unter *Gemeinsames Ergebnis*.
 5. Nach der Vorstellung der Ergebnisse: **„Auflösung freischalten"**.
 
 Die Moderationsansicht zeigt zusätzlich zu jeder Abgabe die vollständigen Antworten
-(Aufklappen unter „Details") sowie die Zahl der Abgaben.
+(Aufklappen unter „Details") sowie die Zahl der Abgaben. Über das **×** an einer Karte
+lässt sich eine einzelne Abgabe löschen, über **„Alle Abgaben löschen"** der ganze
+Probelauf — damit vor der Präsentation aufgeräumt werden kann.
+
+Für Teilnehmende gilt: Entwürfe und der Abgabe-Status bleiben im Browser erhalten,
+auch wenn zwischendurch die Wissensbasis aufgerufen wird. Löscht die Moderation eine
+Abgabe, wird das Formular bei den Teilnehmenden wieder freigegeben.
 
 ## Datenbank
 
@@ -43,8 +49,12 @@ es ist nichts weiter zu tun.
 - Schema und Zugriffsregeln: `supabase-setup.sql` (bereits eingespielt)
 
 Der anon-Key steht bewusst offen in `config.js` — so ist er bei Supabase gedacht.
-Was er darf, regeln die RLS-Policies: Abgaben **lesen und anlegen** sowie den
-Session-Zustand umschalten. Ändern und Löschen ist nicht möglich.
+Was er darf, regeln die RLS-Policies: Abgaben **lesen, anlegen und löschen** sowie den
+Session-Zustand umschalten. Nachträgliches **Ändern** von Abgaben ist nicht möglich.
+
+Das Löschrecht braucht es für die Moderation. Die Schaltflächen dafür sind nur über
+`?presenter=CODE` sichtbar — das ist eine Hürde, kein echter Schutz. Ohne Server
+liesse sich das nicht sauberer lösen.
 
 Ohne Konfiguration liefe die Seite in einem **Testmodus** (Eingaben nur lokal im
 Browser, mit Hinweisbanner) — das ist der Fallback, falls `config.js` mal leer ist.

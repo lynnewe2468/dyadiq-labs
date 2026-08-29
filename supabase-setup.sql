@@ -31,15 +31,20 @@ alter table public.session_state enable row level security;
 
 drop policy if exists "read submissions"   on public.submissions;
 drop policy if exists "insert submissions" on public.submissions;
+drop policy if exists "delete submissions" on public.submissions;
 drop policy if exists "read state"         on public.session_state;
 drop policy if exists "update state"       on public.session_state;
 
--- Jeder mit dem Link darf Abgaben lesen und neue anlegen,
--- aber nichts ändern oder löschen.
+-- Jeder mit dem Link darf Abgaben lesen, neue anlegen und löschen.
+-- Ändern ist nicht möglich. Löschen braucht es, damit die Moderation
+-- Probeläufe wieder aufräumen kann; die Schaltflächen dafür sind nur
+-- über ?presenter=CODE sichtbar.
 create policy "read submissions"   on public.submissions
   for select to anon using (true);
 create policy "insert submissions" on public.submissions
   for insert to anon with check (true);
+create policy "delete submissions" on public.submissions
+  for delete to anon using (true);
 
 -- Zustand darf gelesen und umgeschaltet werden.
 -- (Die Moderationsansicht ist nur über ?presenter=CODE erreichbar –
