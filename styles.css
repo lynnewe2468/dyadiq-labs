@@ -554,8 +554,6 @@ img { display: block; max-width: 100%; }
   }
   .brand-name { font-size: 16px; }
   .nav > .btn.btn-sm { padding: 9px 16px; font-size: 13px; }
-  .kb { scroll-margin-top: 130px; }
-  .task { scroll-margin-top: 150px; }
   .conn-banner, .presenter-bar { top: 0; position: static; }
 }
 
@@ -657,7 +655,7 @@ img { display: block; max-width: 100%; }
 .kb {
   padding: clamp(56px, 7vw, 84px) var(--pad-x);
   border-top: 1px solid var(--hairline);
-  scroll-margin-top: 90px;
+  scroll-margin-top: 112px;
 }
 .kb-alt { background: var(--bg-deep); }
 .kb-inner {
@@ -906,7 +904,6 @@ img { display: block; max-width: 100%; }
 }
 @media (max-width: 640px) {
   .split, .gap-grid { grid-template-columns: 1fr; }
-  .kb { scroll-margin-top: 76px; }
 }
 
 /* ============================================================
@@ -973,7 +970,7 @@ img { display: block; max-width: 100%; }
 .lg-l { background: rgba(255,255,255,.07); color: var(--text-85); }
 
 /* ---------- Der Bericht ---------- */
-.report-section { padding: clamp(40px, 5vw, 60px) var(--pad-x); }
+.report-section { padding: clamp(40px, 5vw, 60px) var(--pad-x); scroll-margin-top: 112px; }
 .report {
   max-width: 900px; margin: 0 auto;
   background: var(--surface); border: 1px solid var(--hairline);
@@ -1056,15 +1053,14 @@ img { display: block; max-width: 100%; }
 .tasks-intro p { font-size: 16px; color: var(--text-78); margin: 0; }
 
 .task { background: var(--surface); border: 1px solid var(--hairline); border-radius: 16px; padding: clamp(24px, 3.5vw, 34px); margin-bottom: 22px; scroll-margin-top: 140px; }
-.task-head { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 20px; }
+.task-head { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
 .task-num {
   flex: none; width: 46px; height: 46px; border-radius: 11px;
   display: flex; align-items: center; justify-content: center;
   background: var(--chip-bg); color: var(--accent-num);
   font-family: 'Fraunces', var(--serif); font-style: italic; font-size: 19px;
 }
-.task-head h3 { font-size: 21px; font-weight: 700; margin: 0 0 5px; }
-.task-sub { font-size: 15px; color: var(--text-78); margin: 0; }
+.task-head h3 { font-size: 21px; font-weight: 700; margin: 0; }
 .task-material { border-left: 2px solid var(--accent); background: oklch(0.78 0.14 165 / .05); border-radius: 0 10px 10px 0; padding: 14px 18px; margin-bottom: 26px; }
 .material-label { display: block; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--accent); margin-bottom: 6px; }
 .task-material p { font-size: 15px; line-height: 1.6; color: var(--text-85); margin: 0; }
@@ -1236,4 +1232,11 @@ textarea:focus, .group-input:focus { outline: none; border-color: oklch(0.78 0.1
   font-size: 12.5px; font-weight: 600; color: var(--accent);
   margin: 0 0 14px; padding: 8px 12px;
   background: oklch(0.78 0.14 165 / .07); border-radius: 8px;
+}
+
+/* ---------- Sprungziele: Abstand zur klebenden Navigation ----------
+   Muss ganz am Ende stehen, sonst gewinnen die Basis-Regeln weiter oben. */
+@media (max-width: 720px) {
+  .kb, .report-section { scroll-margin-top: 128px; }
+  .task { scroll-margin-top: 152px; }
 }
