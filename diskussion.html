@@ -196,18 +196,26 @@
           </div>
 
           <form class="task-form" data-task="1" novalidate>
-            <div class="field">
-              <label for="t1-q1">1 — Was macht DyadIQ hier methodisch besser als zwei der drei echten Studien?</label>
-              <textarea id="t1-q1" name="q1" rows="4" required placeholder="Eure Antwort …"></textarea>
+            <div class="question">
+              <p class="q-text"><span class="q-num">1</span><span>In Pauls Bericht liegt beim Prototyp <strong>E&nbsp;=&nbsp;7,0</strong> und <strong>W&nbsp;=&nbsp;5,0</strong> vor. Welcher Fall der Konstellationsmatrix trifft zu?</span></p>
+              <div class="mc" data-answer-group="Frage 1" data-answer-kind="radio" role="radiogroup" aria-label="Frage 1">
+                <label class="opt"><input type="radio" name="f1" value="A" required><span><b>A</b> P1 &ndash; Kongruenz auf hohem Niveau</span></label>
+                <label class="opt"><input type="radio" name="f1" value="B"><span><b>B</b> P3 &ndash; Diskrepanz abwärts, stark</span></label>
+                <label class="opt"><input type="radio" name="f1" value="C"><span><b>C</b> P4 &ndash; Diskrepanz aufwärts, stark</span></label>
+                <label class="opt"><input type="radio" name="f1" value="D"><span><b>D</b> P6 &ndash; Diskrepanz aufwärts, schwach</span></label>
+              </div>
             </div>
-            <div class="field">
-              <label for="t1-q2">2 — Sind die gezeigten Zahlen damit schon die Wahrheit über Nora?</label>
-              <textarea id="t1-q2" name="q2" rows="4" required placeholder="Eure Antwort …"></textarea>
+
+            <div class="question">
+              <p class="q-text"><span class="q-num">2</span><span>Bei den Antiprototyp-Merkmalen zeigt der Bericht <strong>E&nbsp;=&nbsp;2,5</strong> und <strong>W&nbsp;=&nbsp;4,5</strong>. Was bedeutet das inhaltlich?</span></p>
+              <div class="mc" data-answer-group="Frage 2" data-answer-kind="radio" role="radiogroup" aria-label="Frage 2">
+                <label class="opt"><input type="radio" name="f2" value="A" required><span><b>A</b> Paul wünscht sich mehr negative Merkmale bei Nora, als er wahrnimmt</span></label>
+                <label class="opt"><input type="radio" name="f2" value="B"><span><b>B</b> Nora zeigt aus Pauls Sicht mehr unerwünschte Merkmale, als sein Schema erwartet</span></label>
+                <label class="opt"><input type="radio" name="f2" value="C"><span><b>C</b> Nora und Paul stimmen bei den negativen Merkmalen vollständig überein</span></label>
+                <label class="opt"><input type="radio" name="f2" value="D"><span><b>D</b> Der Wert lässt sich ohne den LMX-Score nicht interpretieren</span></label>
+              </div>
             </div>
-            <div class="field">
-              <label for="t1-key">Fasst eure zentrale Erkenntnis in einem Satz zusammen <span class="req">wird für alle sichtbar</span></label>
-              <textarea id="t1-key" name="key" rows="2" required maxlength="400" placeholder="Was nehmt ihr aus dieser Aufgabe mit? …"></textarea>
-            </div>
+
             <p class="submit-warning">Prüft eure Antwort vor dem Abgeben &ndash; einmal abgeschickt, lässt sie sich nicht mehr ändern.</p>
             <div class="form-foot">
               <input class="group-input" type="text" name="group" required maxlength="60" placeholder="Gruppenname, z. B. Gruppe 2" aria-label="Gruppenname">
@@ -231,38 +239,39 @@
 
           <form class="task-form" data-task="2" novalidate>
             <div class="claim">
-              <p class="claim-text"><span class="claim-num">A</span>„Die vorliegende Konstellation kann mit Pauls LMX-Bewertung zusammenhängen."</p>
-              <div class="radios" role="radiogroup" aria-label="Einordnung Aussage A">
+              <p class="claim-text"><span class="claim-num">A</span>„Paul erwartet von einer Führungskraft mehr Engagement und Intelligenz, als er bei Nora wahrnimmt."</p>
+              <div class="radios" data-answer-group="Aussage A" data-answer-kind="radio" role="radiogroup" aria-label="Einordnung Aussage A">
                 <label><input type="radio" name="a1" value="gestützt" required><span>gestützt</span></label>
                 <label><input type="radio" name="a1" value="eingeschränkt gestützt"><span>eingeschränkt gestützt</span></label>
                 <label><input type="radio" name="a1" value="nicht gestützt"><span>nicht gestützt</span></label>
               </div>
-              <textarea name="b1" rows="2" required placeholder="Begründung …"></textarea>
+              <div data-answer-group="Begründung A" data-answer-kind="text">
+                <textarea name="b1" rows="2" placeholder="Begründung (optional) …"></textarea>
+              </div>
             </div>
 
             <div class="claim">
-              <p class="claim-text"><span class="claim-num">B</span>„Die Diskrepanz verursacht Pauls niedrige LMX-Bewertung."</p>
-              <div class="radios" role="radiogroup" aria-label="Einordnung Aussage B">
+              <p class="claim-text"><span class="claim-num">B</span>„Weil Paul eine Diskrepanz wahrnimmt, bewertet er die Beziehung schlecht."</p>
+              <div class="radios" data-answer-group="Aussage B" data-answer-kind="radio" role="radiogroup" aria-label="Einordnung Aussage B">
                 <label><input type="radio" name="a2" value="gestützt" required><span>gestützt</span></label>
                 <label><input type="radio" name="a2" value="eingeschränkt gestützt"><span>eingeschränkt gestützt</span></label>
                 <label><input type="radio" name="a2" value="nicht gestützt"><span>nicht gestützt</span></label>
               </div>
-              <textarea name="b2" rows="2" required placeholder="Begründung …"></textarea>
+              <div data-answer-group="Begründung B" data-answer-kind="text">
+                <textarea name="b2" rows="2" placeholder="Begründung (optional) …"></textarea>
+              </div>
             </div>
 
             <div class="claim">
-              <p class="claim-text"><span class="claim-num">C</span>„Nora ist die Ursache des Beziehungsproblems."</p>
-              <div class="radios" role="radiogroup" aria-label="Einordnung Aussage C">
+              <p class="claim-text"><span class="claim-num">C</span>„Der Bericht zeigt, wie Nora wirklich ist."</p>
+              <div class="radios" data-answer-group="Aussage C" data-answer-kind="radio" role="radiogroup" aria-label="Einordnung Aussage C">
                 <label><input type="radio" name="a3" value="gestützt" required><span>gestützt</span></label>
                 <label><input type="radio" name="a3" value="eingeschränkt gestützt"><span>eingeschränkt gestützt</span></label>
                 <label><input type="radio" name="a3" value="nicht gestützt"><span>nicht gestützt</span></label>
               </div>
-              <textarea name="b3" rows="2" required placeholder="Begründung …"></textarea>
-            </div>
-
-            <div class="field">
-              <label for="t2-key">Fasst eure zentrale Erkenntnis in einem Satz zusammen <span class="req">wird für alle sichtbar</span></label>
-              <textarea id="t2-key" name="key" rows="2" required maxlength="400" placeholder="Was nehmt ihr aus dieser Aufgabe mit? …"></textarea>
+              <div data-answer-group="Begründung C" data-answer-kind="text">
+                <textarea name="b3" rows="2" placeholder="Begründung (optional) …"></textarea>
+              </div>
             </div>
             <p class="submit-warning">Prüft eure Antwort vor dem Abgeben &ndash; einmal abgeschickt, lässt sie sich nicht mehr ändern.</p>
             <div class="form-foot">
@@ -286,16 +295,13 @@
           </div>
 
           <form class="task-form" data-task="3" novalidate>
-            <div class="checks">
-              <label class="check"><input type="checkbox" name="e1" value="Unklar, ob E oder W der richtige Ansatzpunkt ist"><span>Es ist unklar, ob <strong>E oder W</strong> überhaupt der richtige Ansatzpunkt ist.</span></label>
-              <label class="check"><input type="checkbox" name="e2" value="Keine Studie hat eine Verhaltensänderung getestet"><span>Keine Studie hat eine <strong>Verhaltensänderung</strong> tatsächlich getestet.</span></label>
-              <label class="check"><input type="checkbox" name="e3" value="Pauls Erwartungswert wird nie hinterfragt"><span>Pauls <strong>Erwartungswert</strong> selbst wird nie hinterfragt.</span></label>
+            <p class="q-text q-text-solo">DyadIQ empfiehlt: <em>„Paul sollte durch ein Führungskräftecoaching stärker an Noras Erwartungsprofil angepasst werden."</em> Welche Einwände gegen diese Empfehlung sind inhaltlich begründet? <span class="q-hint">Mehrfachauswahl möglich</span></p>
+            <div class="checks" data-answer-group="Begründete Einwände" data-answer-kind="checkbox" data-min="1">
+              <label class="check"><input type="checkbox" name="e1" value="A"><span><b>A</b> Der Bericht zeigt nur Pauls Werte &mdash; wir wissen nicht, warum er Nora so wahrnimmt.</span></label>
+              <label class="check"><input type="checkbox" name="e2" value="B"><span><b>B</b> Die Empfehlung benennt falsch, bei welchen Merkmalen die Diskrepanz liegt.</span></label>
+              <label class="check"><input type="checkbox" name="e3" value="C"><span><b>C</b> Eine Maßnahme sollte beide Seiten der Beziehung einbeziehen, nicht nur auf Pauls Bewertung reagieren.</span></label>
             </div>
 
-            <div class="field">
-              <label for="t3-key">Formulierungsvorschlag — was dürfte DyadIQ stattdessen verantwortbar ausgeben? <span class="req">wird für alle sichtbar</span></label>
-              <textarea id="t3-key" name="key" rows="3" required maxlength="400" placeholder="Euer Vorschlag …"></textarea>
-            </div>
             <p class="submit-warning">Prüft eure Antwort vor dem Abgeben &ndash; einmal abgeschickt, lässt sie sich nicht mehr ändern.</p>
             <div class="form-foot">
               <input class="group-input" type="text" name="group" required maxlength="60" placeholder="Gruppenname, z. B. Gruppe 2" aria-label="Gruppenname">
@@ -338,55 +344,26 @@
 
         <div class="reveal-open is-hidden" id="reveal-open">
           <span class="kicker">Auflösung</span>
-          <h2>Was DyadIQ hätte ausgeben dürfen</h2>
+          <h2>Musterlösungen</h2>
 
-          <div class="report report-clean">
-            <div class="report-chrome">
-              <span class="report-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="report-title">DyadIQ&nbsp;· Beziehungsbericht <em>(entschärft)</em></span>
-            </div>
-            <div class="report-body">
-              <div class="output output-clean">
-                <span class="output-label">Befund</span>
-                <p>Nora erwartet positive Führungsmerkmale stärker, als sie Paul bei ihr wahrnimmt, und Paul bewertet die Beziehung niedrig.</p>
-              </div>
-              <div class="output output-clean">
-                <span class="output-label">Grenzen der Aussage</span>
-                <p>Die Daten erlauben <strong>keine Aussage darüber</strong>, wodurch diese Konstellation entstanden ist oder wer sich verändern sollte.</p>
-              </div>
-              <div class="output output-clean">
-                <span class="output-label">Nächster Schritt</span>
-                <p>Vor einer Maßnahme sollten <strong>beide Perspektiven</strong> sowie die konkreten Erfahrungen hinter den Bewertungen geklärt werden.</p>
-              </div>
-            </div>
-          </div>
-
-          <h3 class="solutions-title">Musterlösungen</h3>
           <div class="solutions">
             <article class="solution">
               <span class="task-num-sm">01</span>
               <h4>Einordnen</h4>
-              <p>DyadIQ lässt E und W <strong>getrennt stehen</strong>, statt sie wie Epitropaki/Martin und Hesmert/Vogel zu einem einzigen Differenzwert zu verrechnen — dadurch gehen Niveau und Richtung nicht verloren. Das ist methodisch sauberer.</p>
-              <p>Trotzdem sind die Werte selbst <strong>zweifach subjektiv</strong>: W ist Pauls Zuschreibung, keine objektive Eigenschaft Noras. Und E ist trotz sauberer Trennung nur eine bewusste Selbstauskunft über ein eigentlich unbewusstes Bild — kein direkter Zugriff auf ein implizites Schema.</p>
+              <p>Musterlösung Frage 1 &mdash; B, P3. E liegt über W (7,0 zu 5,0), Paul erwartet also mehr Intelligenz und Engagement, als er bei Nora wahrnimmt, das ist eine Diskrepanz abwärts mit einem Abstand von 2,0 Punkten, also stark. Frage 2 &mdash; B, N4. W liegt über E (4,5 zu 2,5), Nora zeigt aus Pauls Sicht also mehr unerwünschte Merkmale, als sein Schema erwartet, das ist eine Diskrepanz aufwärts, stark.</p>
             </article>
             <article class="solution">
               <span class="task-num-sm">02</span>
               <h4>Erklären</h4>
-              <ul>
-                <li><strong>A — gestützt.</strong> Die drei Studien zeigen tatsächlich einen statistischen Zusammenhang.</li>
-                <li><strong>B — nicht bzw. nur eingeschränkt gestützt.</strong> Kein Studiendesign beweist Kausalität, selbst das Längsschnittdesign von Epitropaki und Martin nicht, da keine experimentelle Veränderung stattfand.</li>
-                <li><strong>C — nicht gestützt.</strong> Die Daten sind Pauls subjektive Zuschreibung, keine objektive Beschreibung von Noras Verhalten oder Persönlichkeit.</li>
-              </ul>
+              <p>Musterlösung A &mdash; gestützt. Das ist exakt das, was die E- und W-Werte bei den Prototyp-Merkmalen zeigen. B &mdash; eingeschränkt gestützt. Ein Zusammenhang ist in den Studien zu finden, aber kein Studiendesign beweist Kausalität. C &mdash; nicht gestützt. Der Bericht zeigt Pauls subjektive Zuschreibung an Nora, keine objektive Beschreibung ihres tatsächlichen Verhaltens.</p>
             </article>
             <article class="solution">
               <span class="task-num-sm">03</span>
               <h4>Verändern</h4>
-              <p>Die Empfehlung ist <strong>nicht gedeckt</strong>: Keine der drei Studien hat getestet, ob eine gezielte Verhaltensänderung bei der Führungskraft die LMX-Qualität tatsächlich verbessert. Zudem wird unhinterfragt vorausgesetzt, dass Pauls Erwartungswert der richtige Maßstab ist.</p>
-              <p>Verantwortbar wäre höchstens, die Diskrepanz zu <strong>benennen</strong> und ein <strong>Gespräch</strong> über die dahinterliegenden Erfahrungen beider Seiten vorzuschlagen — statt eine konkrete Verhaltensänderung vorzuschreiben.</p>
+              <p>Musterlösung A und C treffen zu, B trifft nicht zu. A, die Werte im Bericht sind ausschließlich Pauls Zuschreibung an Nora. C, LMX beschreibt eine Austauschbeziehung zwischen zwei Personen, eine Maßnahme sollte deshalb beide Seiten einbeziehen. B trifft nicht zu, die Empfehlung benennt mit Engagement und Intelligenz genau die Merkmale, bei denen laut Bericht eine Diskrepanz vorliegt.</p>
             </article>
           </div>
         </div>
-
       </div>
     </section>
 

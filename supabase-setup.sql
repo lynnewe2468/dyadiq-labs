@@ -10,8 +10,10 @@ create table if not exists public.submissions (
   created_at    timestamptz  not null default now(),
   task          smallint     not null check (task between 1 and 3),
   group_name    text         not null check (char_length(group_name) between 1 and 60),
-  key_statement text         not null check (char_length(key_statement) between 1 and 400),
-  answers       jsonb        not null default '{}'::jsonb
+  answers       jsonb        not null default '{}'::jsonb,
+  -- Altlast aus einer früheren Aufgabenfassung ("Kernaussage"); wird nicht
+  -- mehr gefüllt, bleibt aber für alte Probelaeufe erhalten.
+  key_statement text
 );
 
 -- 2) Zustand der Session (genau eine Zeile) -------------------
@@ -54,6 +56,11 @@ create policy "read state"   on public.session_state
   for select to anon using (true);
 create policy "update state" on public.session_state
   for update to anon using (true) with check (true);
+
+-- Hinweis zum Feld answers: es enthaelt
+--   { "items": [ { "label": "Frage 1", "value": "B P3 – ..." }, ... ] }
+-- also die vollstaendigen Antworten in Anzeigereihenfolge. value ist ein
+-- String oder, bei Mehrfachauswahl, ein Array von Strings.
 
 -- ============================================================
 -- Nach der Präsentation aufräumen:

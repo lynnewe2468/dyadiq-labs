@@ -174,6 +174,49 @@
   }
 
   /* ============================================================
+     Antworten einsammeln — in Dokumentreihenfolge, mit lesbaren
+     Beschriftungen, damit sie unverändert veröffentlicht werden können
+     ============================================================ */
+  function optText(input) {
+    var lab = input.closest ? input.closest('label') : null;
+    return lab ? lab.textContent.replace(/\s+/g, ' ').trim() : input.value;
+  }
+
+  function collectAnswers(form) {
+    var items = [];
+    Array.prototype.forEach.call(form.querySelectorAll('[data-answer-group]'), function (g) {
+      var label = g.getAttribute('data-answer-group');
+      var kind = g.getAttribute('data-answer-kind');
+      if (kind === 'radio') {
+        var sel = g.querySelector('input[type="radio"]:checked');
+        if (sel) items.push({ label: label, value: optText(sel) });
+      } else if (kind === 'checkbox') {
+        var picked = Array.prototype.map.call(g.querySelectorAll('input[type="checkbox"]:checked'), optText);
+        if (picked.length) items.push({ label: label, value: picked });
+      } else {
+        var t = g.querySelector('textarea, input[type="text"]');
+        var v = t ? t.value.trim() : '';
+        if (v) items.push({ label: label, value: v });
+      }
+    });
+    return items;
+  }
+
+  /* Pflichtfelder, die der Browser nicht selbst prüfen kann */
+  function checkGroups(form) {
+    var problem = null;
+    Array.prototype.forEach.call(form.querySelectorAll('[data-answer-kind="checkbox"][data-min]'), function (g) {
+      if (problem) return;
+      var min = Number(g.getAttribute('data-min')) || 0;
+      if (g.querySelectorAll('input[type="checkbox"]:checked').length < min) {
+        problem = min === 1 ? 'Bitte mindestens eine Option auswählen.'
+                            : 'Bitte mindestens ' + min + ' Optionen auswählen.';
+      }
+    });
+    return problem;
+  }
+
+  /* ============================================================
      Abgabe-Status: bleibt erhalten, fällt aber zurück, wenn die
      Moderation die Abgabe wieder löscht
      ============================================================ */
@@ -215,6 +258,26 @@
     }
   }
 
+  /* Antworten einer Abgabe darstellen. Verträgt auch das alte Format
+     (flaches Objekt) aus früheren Probeläufen. */
+  function answersHtml(r) {
+    var a = r.answers;
+    var items = a && Array.isArray(a.items) ? a.items
+      : (a && typeof a === 'object'
+          ? Object.keys(a).map(function (k) { return { label: k, value: a[k] }; })
+          : []);
+    var out = '';
+    if (r.key_statement) out += '<p class="res-legacy">' + esc(r.key_statement) + '</p>';
+    if (!items.length) return out || '<p class="res-legacy">Keine Angaben.</p>';
+    out += '<dl class="res-answers">' + items.map(function (it) {
+      var v = Array.isArray(it.value)
+        ? '<ul>' + it.value.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'
+        : esc(it.value);
+      return '<dt>' + esc(it.label) + '</dt><dd>' + v + '</dd>';
+    }).join('') + '</dl>';
+    return out;
+  }
+
   function renderSubs(rows) {
     // Abgabe-Status gegen die tatsächlich vorhandenen Zeilen abgleichen
     var ids = {};
@@ -243,20 +306,13 @@
         return;
       }
       host.innerHTML = mine.map(function (r) {
-        var details = '';
-        if (isPresenter && r.answers && Object.keys(r.answers).length) {
-          details = '<details class="res-details"><summary>Details</summary><dl>' +
-            Object.keys(r.answers).map(function (k) {
-              return '<dt>' + esc(k) + '</dt><dd>' + esc(r.answers[k]) + '</dd>';
-            }).join('') + '</dl></details>';
-        }
         var del = isPresenter
           ? '<button class="res-del" type="button" data-del="' + esc(r.id) + '" title="Diese Abgabe löschen" aria-label="Abgabe von ' + esc(r.group_name) + ' löschen">&times;</button>'
           : '';
         return '<article class="res-card">' +
           '<header><span class="res-group">' + esc(r.group_name) + '</span>' +
           '<span class="res-time">' + esc(timeOf(r.created_at)) + '</span>' + del + '</header>' +
-          '<p>' + esc(r.key_statement) + '</p>' + details + '</article>';
+          answersHtml(r) + '</article>';
       }).join('');
     });
 
@@ -338,17 +394,22 @@
       e.preventDefault();
       if (!form.reportValidity()) return;
 
-      var data = new FormData(form);
-      var group = String(data.get('group') || '').trim();
-      var key = String(data.get('key') || '').trim();
-      if (!group || !key) return;
+      var groupProblem = checkGroups(form);
+      if (groupProblem) {
+        status.textContent = groupProblem;
+        status.className = 'form-status is-error';
+        return;
+      }
 
-      var answers = {};
-      data.forEach(function (v, k) {
-        if (k === 'group' || k === 'key') return;
-        var val = String(v).trim();
-        if (val) answers[k] = answers[k] ? answers[k] + ' · ' + val : val;
-      });
+      var group = String(new FormData(form).get('group') || '').trim();
+      if (!group) return;
+
+      var items = collectAnswers(form);
+      if (!items.length) {
+        status.textContent = 'Bitte erst die Aufgabe beantworten.';
+        status.className = 'form-status is-error';
+        return;
+      }
 
       button.disabled = true;
       status.textContent = 'Wird gesendet …';
@@ -357,8 +418,7 @@
       store.add({
         task: Number(form.dataset.task),
         group_name: group.slice(0, 60),
-        key_statement: key.slice(0, 400),
-        answers: answers
+        answers: { items: items }
       }).then(function (row) {
         if (row && row.id != null) lsSet(SENT_KEY + form.dataset.task, String(row.id));
         saveDraft(form);

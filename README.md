@@ -20,18 +20,17 @@ Beide zeigen auf die Übersichtsseite.
 | --- | --- |
 | `index.html` | **Übersicht** — die Produktseite, wie sie ein echtes HR-Tech-Startup hätte. Bewusst szenariofrei: kein Nora/Paul, kein Präsentationsbezug. |
 | `wissen.html` | **Wissensbasis** — ILT/IFT, Erwartungs- und Wahrnehmungswert, LMX, Konstellationsmatrix, Befundlage der drei Studien, offene Forschungslücken. |
-| `diskussion.html` | **Demo** — Ausgangslage, der DyadIQ-Bericht, drei Gruppenaufgaben, gemeinsam sichtbare Ergebnisse, Abschluss-Auflösung. |
+| `diskussion.html` | **Demo** — Ausgangslage, der DyadIQ-Bericht, drei Gruppenaufgaben (Multiple Choice, Einordnung mit optionaler Begründung, Mehrfachauswahl), gemeinsam sichtbare Ergebnisse, Musterlösungen zum Freischalten. |
 
 ## Ablauf am Präsentationstag
 
 1. Die Demo-Seite ist zunächst **gesperrt**; Übersicht und Wissensbasis sind frei zugänglich.
 2. Moderationsansicht öffnen: `diskussion.html?presenter=CODE` (Code steht in `config.js`).
 3. **„Demo freischalten"** → alle Betrachter sehen die Aufgaben.
-4. Die Gruppen geben ab; die Kernaussagen erscheinen bei allen unter *Gemeinsames Ergebnis*.
+4. Die Gruppen geben ab; ihre **vollständigen Antworten** erscheinen bei allen unter *Gemeinsames Ergebnis*.
 5. Nach der Vorstellung der Ergebnisse: **„Auflösung freischalten"**.
 
-Die Moderationsansicht zeigt zusätzlich zu jeder Abgabe die vollständigen Antworten
-(Aufklappen unter „Details") sowie die Zahl der Abgaben. Über das **×** an einer Karte
+Die Moderationsansicht zeigt zusätzlich die Zahl der Abgaben. Über das **×** an einer Karte
 lässt sich eine einzelne Abgabe löschen, über **„Alle Abgaben löschen"** der ganze
 Probelauf — damit vor der Präsentation aufgeräumt werden kann.
 

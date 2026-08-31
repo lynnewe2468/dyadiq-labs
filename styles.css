@@ -1098,7 +1098,7 @@ textarea:focus, .group-input:focus { outline: none; border-color: oklch(0.78 0.1
 .radios input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .radios input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-.checks { display: grid; gap: 10px; margin-bottom: 22px; }
+.checks { display: grid; gap: 10px; margin-bottom: 4px; }
 .check { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 14px 16px; border: 1px solid var(--hairline); border-radius: 10px; transition: border-color .2s, background .2s; }
 .check:hover { border-color: oklch(0.78 0.14 165 / .4); }
 .check input { flex: none; width: 18px; height: 18px; margin: 1px 0 0; accent-color: #49d3a1; cursor: pointer; }
@@ -1132,11 +1132,17 @@ textarea:focus, .group-input:focus { outline: none; border-color: oklch(0.78 0.1
 .res-group { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--accent); }
 .res-time { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .res-card p { font-size: 14.5px; line-height: 1.6; color: var(--text-85); margin: 0; overflow-wrap: anywhere; }
-.res-details { margin-top: 10px; font-size: 13px; }
-.res-details summary { cursor: pointer; color: var(--text-muted); }
-.res-details dl { margin: 8px 0 0; }
-.res-details dt { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); margin-top: 8px; }
-.res-details dd { margin: 2px 0 0; color: var(--text-78); overflow-wrap: anywhere; }
+.res-answers { margin: 0; font-size: 13.5px; }
+.res-answers dt {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  color: var(--text-muted); margin-top: 10px;
+}
+.res-answers dt:first-child { margin-top: 0; }
+.res-answers dd { margin: 3px 0 0; line-height: 1.5; color: var(--text-85); overflow-wrap: anywhere; }
+.res-answers ul { margin: 3px 0 0; padding-left: 17px; }
+.res-answers li { line-height: 1.5; color: var(--text-85); }
+.res-answers li + li { margin-top: 4px; }
+.res-legacy { font-size: 14px; line-height: 1.55; color: var(--text-85); margin: 0 0 8px; overflow-wrap: anywhere; }
 
 /* ---------- Auflösung ---------- */
 .reveal-section { padding: clamp(50px, 6vw, 80px) var(--pad-x); border-top: 1px solid var(--hairline); background: var(--bg-deep); }
@@ -1203,7 +1209,7 @@ textarea:focus, .group-input:focus { outline: none; border-color: oklch(0.78 0.1
 /* ---------- Warnung vor dem Abgeben ---------- */
 .submit-warning {
   font-size: 13.5px; line-height: 1.55; color: var(--text-muted);
-  margin: 0 0 4px; padding-left: 24px; position: relative;
+  margin: 22px 0 2px; padding-left: 24px; position: relative;
 }
 .submit-warning::before {
   content: '!'; position: absolute; left: 0; top: 0;
@@ -1233,6 +1239,68 @@ textarea:focus, .group-input:focus { outline: none; border-color: oklch(0.78 0.1
   margin: 0 0 14px; padding: 8px 12px;
   background: oklch(0.78 0.14 165 / .07); border-radius: 8px;
 }
+
+/* ============================================================
+   Aufgabenformate: Multiple Choice und Fragestellungen
+   ============================================================ */
+.question + .question { margin-top: 32px; }
+
+.q-text {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 15.5px; font-weight: 600; line-height: 1.55;
+  color: var(--text-92); margin: 0 0 14px;
+}
+.q-text strong { color: var(--text); font-weight: 700; white-space: nowrap; }
+.q-num {
+  flex: none; width: 24px; height: 24px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--chip-bg); color: var(--accent-num);
+  font-family: 'Fraunces', var(--serif); font-style: italic; font-size: 13px;
+  margin-top: 1px;
+}
+.q-text-solo { display: block; margin-bottom: 20px; font-weight: 500; line-height: 1.6; }
+.q-text-solo em { font-style: italic; color: var(--text); }
+.q-hint {
+  display: inline-block; margin-left: 4px;
+  font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+  color: var(--text-muted); white-space: nowrap;
+}
+
+/* Antwortoptionen (einzelne Auswahl) */
+.mc { display: grid; gap: 8px; }
+.opt {
+  display: flex; align-items: flex-start; gap: 12px; cursor: pointer;
+  padding: 13px 16px; border: 1px solid var(--hairline); border-radius: 10px;
+  transition: border-color .2s, background .2s;
+}
+.opt:hover { border-color: oklch(0.78 0.14 165 / .4); }
+.opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+.opt > span { font-size: 15px; line-height: 1.5; color: var(--text-85); }
+.opt b {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; margin-right: 8px; border-radius: 5px;
+  background: rgba(255, 255, 255, .06); border: 1px solid var(--hairline);
+  font-size: 11.5px; font-weight: 800; color: var(--text-80);
+  vertical-align: text-bottom;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.opt:has(input:checked) { border-color: oklch(0.78 0.14 165 / .55); background: oklch(0.78 0.14 165 / .07); }
+.opt:has(input:checked) > span { color: var(--text); }
+.opt:has(input:checked) b { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.opt:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* Buchstaben-Marker auch in der Mehrfachauswahl */
+.check b {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; margin-right: 8px; border-radius: 5px;
+  background: rgba(255, 255, 255, .06); border: 1px solid var(--hairline);
+  font-size: 11.5px; font-weight: 800; color: var(--text-80);
+  vertical-align: text-bottom;
+}
+.check:has(input:checked) b { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+/* Begründungsfeld in Aufgabe 2 sitzt jetzt in eigenem Wrapper */
+.claim .radios { margin-bottom: 12px; }
 
 /* ---------- Sprungziele: Abstand zur klebenden Navigation ----------
    Muss ganz am Ende stehen, sonst gewinnen die Basis-Regeln weiter oben. */
