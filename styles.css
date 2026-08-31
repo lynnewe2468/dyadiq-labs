@@ -1155,9 +1155,20 @@ textarea:focus, .group-input:focus { outline: none; border-color: oklch(0.78 0.1
 .solutions-title { font-size: 20px; font-weight: 800; margin: 0 0 18px; }
 .solutions { display: grid; gap: 16px; }
 .solution { background: var(--surface); border: 1px solid var(--hairline); border-radius: 14px; padding: 24px 22px; }
-.solution h4 { font-size: 17px; font-weight: 700; margin: 8px 0 12px; }
-.solution p { font-size: 15px; line-height: 1.7; color: var(--text-78); margin: 0 0 12px; }
-.solution p:last-child { margin-bottom: 0; }
+.solution h4 { font-size: 17px; font-weight: 700; margin: 8px 0 16px; }
+.solution p { font-size: 15px; line-height: 1.7; color: var(--text-78); margin: 0; }
+
+/* Musterlösungen: ein Block pro Frage bzw. Aussage */
+.sol-item + .sol-item {
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px dashed var(--hairline);
+}
+.sol-key { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin: 0 0 6px !important; }
+.sol-key span {
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
+  color: var(--accent); flex: none;
+}
+.sol-key strong { font-size: 15.5px; font-weight: 700; color: var(--text); }
 .solution ul { margin: 0; padding-left: 20px; }
 .solution li { font-size: 15px; line-height: 1.7; color: var(--text-78); }
 .solution li + li { margin-top: 8px; }
