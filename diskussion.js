@@ -284,6 +284,8 @@
   /* ---------- Zustand rendern ---------- */
   var state = { discussion_open: false, reveal_open: false };
   var lastSubsJSON = '';
+  var inFlight = null;         // laeuft gerade eine Poll-Runde?
+  var lastConfirmedAt = 0;     // Zeitpunkt der letzten bestaetigten Abgabe
 
   function renderState() {
     var open = state.discussion_open || isPresenter;
@@ -323,7 +325,10 @@
     return out;
   }
 
-  function renderSubs(rows) {
+  /* startedAt = Zeitpunkt, zu dem diese Runde ihre Anfrage gestellt hat. Eine
+     Antwort, die aelter ist als die letzte bestaetigte Abgabe, kennt die neue
+     Zeile noch nicht und darf den Abgabe-Status deshalb nicht zuruecksetzen. */
+  function renderSubs(rows, startedAt) {
     // Abgabe-Status gegen die tatsächlich vorhandenen Zeilen abgleichen
     var ids = {};
     rows.forEach(function (r) { ids[Number(r.id)] = true; });
@@ -332,7 +337,7 @@
       if (id === null) return;
       if (ids[id]) {
         if (!form.classList.contains('is-submitted')) markSubmitted(form, true);
-      } else {
+      } else if (startedAt > lastConfirmedAt) {
         lsDel(SENT_KEY + form.dataset.task);
         markSubmitted(form, false);
       }
@@ -368,20 +373,24 @@
   /* ---------- Poll-Schleife ---------- */
   var failures = 0;
   function tick() {
-    return Promise.all([store.getState(), store.list()])
+    if (inFlight) return inFlight;   // keine ueberlappenden Runden
+    var startedAt = Date.now();
+    inFlight = Promise.all([store.getState(), store.list()])
       .then(function (res) {
         failures = 0;
         if (HAS_REMOTE && banner && banner.classList.contains('conn-error')) setBanner('', '');
         state = res[0] || state;
         renderState();
-        renderSubs(res[1] || []);
+        renderSubs(res[1] || [], startedAt);
       })
       .catch(function (err) {
         failures++;
         if (HAS_REMOTE && failures >= 2) {
           setBanner('Verbindung zur Datenbank gestört — es wird weiter versucht. (' + err.message + ')', 'error');
         }
-      });
+      })
+      .then(function () { inFlight = null; });
+    return inFlight;
   }
 
   /* ---------- Moderationsleiste ---------- */
@@ -466,6 +475,7 @@
         group_name: group.slice(0, 60),
         answers: { items: items }
       }).then(function (row) {
+        lastConfirmedAt = Date.now();
         if (row && row.id != null) lsSet(SENT_KEY + form.dataset.task, String(row.id));
         saveDraft(form);
         markSubmitted(form, true, 'Abgegeben — danke!');
