@@ -1313,6 +1313,17 @@ textarea:focus, .group-input:focus { outline: none; border-color: oklch(0.78 0.1
 /* Begründungsfeld in Aufgabe 2 sitzt jetzt in eigenem Wrapper */
 .claim .radios { margin-bottom: 12px; }
 
+/* ---------- Wortzähler unter den Begründungsfeldern ---------- */
+.word-count {
+  font-size: 12.5px; font-variant-numeric: tabular-nums;
+  color: var(--text-muted); text-align: right;
+  margin: 6px 0 0; transition: color .2s;
+}
+.word-count.is-near { color: oklch(0.82 0.13 75); }
+.word-count.is-over { color: oklch(0.78 0.14 25); font-weight: 700; }
+textarea.is-over { border-color: oklch(0.6 0.16 25 / .6); }
+textarea.is-over:focus { border-color: oklch(0.6 0.16 25 / .8); }
+
 /* ---------- Sprungziele: Abstand zur klebenden Navigation ----------
    Muss ganz am Ende stehen, sonst gewinnen die Basis-Regeln weiter oben. */
 @media (max-width: 720px) {

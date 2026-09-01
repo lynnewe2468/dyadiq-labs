@@ -202,6 +202,51 @@
     return items;
   }
 
+  /* ---------- Wortlimit für die optionalen Begründungen ---------- */
+  function countWords(v) {
+    var t = String(v == null ? '' : v).trim();
+    return t ? t.split(/\s+/).length : 0;
+  }
+
+  /* Zeigt unter jedem begrenzten Feld einen Zähler an */
+  function setupWordLimits(form) {
+    Array.prototype.forEach.call(form.querySelectorAll('[data-max-words]'), function (ta) {
+      var max = Number(ta.getAttribute('data-max-words')) || 0;
+      if (!max || ta.dataset.wcReady) return;
+      ta.dataset.wcReady = '1';
+
+      var counter = document.createElement('p');
+      counter.className = 'word-count';
+      ta.parentNode.insertBefore(counter, ta.nextSibling);
+
+      function update() {
+        var n = countWords(ta.value);
+        counter.textContent = n + ' / ' + max + ' Wörter';
+        counter.classList.toggle('is-over', n > max);
+        counter.classList.toggle('is-near', n <= max && n > Math.floor(max * 0.9));
+        ta.classList.toggle('is-over', n > max);
+      }
+      ta.addEventListener('input', update);
+      update();
+    });
+  }
+
+  /* Meldet das erste Feld, das über dem Wortlimit liegt */
+  function checkWordLimits(form) {
+    var problem = null;
+    Array.prototype.forEach.call(form.querySelectorAll('[data-max-words]'), function (ta) {
+      if (problem) return;
+      var max = Number(ta.getAttribute('data-max-words')) || 0;
+      var n = countWords(ta.value);
+      if (!max || n <= max) return;
+      var g = ta.closest ? ta.closest('[data-answer-group]') : null;
+      var label = (g && g.getAttribute('data-answer-group')) || 'Begründung';
+      problem = label + ' ist zu lang: ' + n + ' von höchstens ' + max + ' Wörtern.';
+      try { ta.focus(); } catch (e) {}
+    });
+    return problem;
+  }
+
   /* Pflichtfelder, die der Browser nicht selbst prüfen kann */
   function checkGroups(form) {
     var problem = null;
@@ -384,6 +429,7 @@
       note.textContent = 'Eure vorherigen Eingaben wurden wiederhergestellt.';
       form.insertBefore(note, form.firstChild);
     }
+    setupWordLimits(form);
     if (sentId(form.dataset.task) !== null) markSubmitted(form, true);
 
     // Entwurf laufend sichern
@@ -394,9 +440,9 @@
       e.preventDefault();
       if (!form.reportValidity()) return;
 
-      var groupProblem = checkGroups(form);
-      if (groupProblem) {
-        status.textContent = groupProblem;
+      var problem = checkWordLimits(form) || checkGroups(form);
+      if (problem) {
+        status.textContent = problem;
         status.className = 'form-status is-error';
         return;
       }
