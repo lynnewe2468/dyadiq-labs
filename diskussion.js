@@ -428,7 +428,7 @@
         return;
       }
       host.innerHTML = mine.map(function (r) {
-        var del = isPresenter
+        var del = isPresenter()
           ? '<button class="res-del" type="button" data-del="' + esc(r.id) + '" title="Diese Abgabe löschen" aria-label="Abgabe von ' + esc(r.group_name) + ' löschen">&times;</button>'
           : '';
         return '<article class="res-card">' +
