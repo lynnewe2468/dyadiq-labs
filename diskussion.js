@@ -279,7 +279,9 @@
 
       var counter = document.createElement('p');
       counter.className = 'word-count';
+      counter.id = 'wc-' + (ta.name || String(Math.random()).slice(2));
       ta.parentNode.insertBefore(counter, ta.nextSibling);
+      ta.setAttribute('aria-describedby', counter.id);
 
       function update() {
         var n = countWords(ta.value);
@@ -327,15 +329,22 @@
      Abgabe-Status: bleibt erhalten, fällt aber zurück, wenn die
      Moderation die Abgabe wieder löscht
      ============================================================ */
-  function markSubmitted(form, on, text) {
+  /* Fehler werden Screenreadern assertiv gemeldet (role="alert"), Fortschritt
+     und Bestaetigung hoeflich (role="status"). Die Rolle wird vor dem Text
+     gesetzt, damit die Meldung mit der richtigen Dringlichkeit ankommt. */
+  function setStatus(form, text, kind) {
     var status = form.querySelector('.form-status');
+    if (!status) return;
+    status.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+    status.className = 'form-status' + (kind ? ' is-' + kind : '');
+    status.textContent = text;
+  }
+
+  function markSubmitted(form, on, text) {
     var button = form.querySelector('button[type="submit"]');
     form.classList.toggle('is-submitted', on);
     if (button) button.disabled = on;
-    if (status) {
-      status.textContent = on ? (text || 'Bereits abgegeben.') : '';
-      status.className = 'form-status' + (on ? ' is-ok' : '');
-    }
+    setStatus(form, on ? (text || 'Bereits abgegeben.') : '', on ? 'ok' : null);
   }
 
   function sentId(task) {
@@ -537,18 +546,28 @@
   /* ---------- Moderationsleiste ---------- */
   {
     var td = $('toggle-discussion'), tr = $('toggle-reveal'), ca = $('clear-all');
-    if (td) td.addEventListener('click', function () {
-      store.setState({ discussion_open: !state.discussion_open }).then(tick)
-        .catch(onPresenterError('Konnte nicht umschalten'));
-    });
-    if (tr) tr.addEventListener('click', function () {
-      store.setState({ reveal_open: !state.reveal_open }).then(tick)
-        .catch(onPresenterError('Konnte nicht umschalten'));
-    });
-    if (ca) ca.addEventListener('click', function () {
-      if (!confirm('Wirklich ALLE Abgaben löschen? Das lässt sich nicht rückgängig machen.')) return;
-      store.clear().then(tick).catch(onPresenterError('Löschen fehlgeschlagen'));
-    });
+
+    /* Der Knopf bleibt gesperrt, bis die Anfrage durch ist -- sonst schickt
+       ein zweiter Klick eine zweite Anfrage los und der Zustand springt. */
+    function guard(btn, run, fehlertext, frage) {
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        if (btn.disabled) return;
+        if (frage && !confirm(frage)) return;
+        btn.disabled = true;
+        run().then(tick)
+          .catch(onPresenterError(fehlertext))
+          .then(function () { btn.disabled = false; });
+      });
+    }
+
+    guard(td, function () { return store.setState({ discussion_open: !state.discussion_open }); },
+      'Konnte nicht umschalten');
+    guard(tr, function () { return store.setState({ reveal_open: !state.reveal_open }); },
+      'Konnte nicht umschalten');
+    guard(ca, function () { return store.clear(); },
+      'Löschen fehlgeschlagen',
+      'Wirklich ALLE Abgaben löschen? Das lässt sich nicht rückgängig machen.');
 
     // Einzelne Abgabe löschen (Delegation, weil neu gerendert wird)
     var grid = $('results-grid');
@@ -565,7 +584,6 @@
 
   /* ---------- Formulare ---------- */
   Array.prototype.forEach.call(document.querySelectorAll('.task-form'), function (form) {
-    var status = form.querySelector('.form-status');
     var button = form.querySelector('button[type="submit"]');
 
     // Entwurf wiederherstellen
@@ -588,25 +606,19 @@
       if (!form.reportValidity()) return;
 
       var problem = checkWordLimits(form) || checkGroups(form);
-      if (problem) {
-        status.textContent = problem;
-        status.className = 'form-status is-error';
-        return;
-      }
+      if (problem) { setStatus(form, problem, 'error'); return; }
 
       var group = String(new FormData(form).get('group') || '').trim();
       if (!group) return;
 
       var items = collectAnswers(form);
       if (!items.length) {
-        status.textContent = 'Bitte erst die Aufgabe beantworten.';
-        status.className = 'form-status is-error';
+        setStatus(form, 'Bitte erst die Aufgabe beantworten.', 'error');
         return;
       }
 
       button.disabled = true;
-      status.textContent = 'Wird gesendet …';
-      status.className = 'form-status';
+      setStatus(form, 'Wird gesendet …');
 
       store.add({
         task: Number(form.dataset.task),
@@ -624,8 +636,7 @@
         tick();
       }).catch(function (err) {
         button.disabled = false;
-        status.textContent = 'Fehler: ' + err.message;
-        status.className = 'form-status is-error';
+        setStatus(form, 'Fehler: ' + err.message, 'error');
       });
     });
   });
