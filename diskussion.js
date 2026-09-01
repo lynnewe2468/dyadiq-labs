@@ -3,10 +3,16 @@
    Speicher: Supabase (REST, ohne SDK). Ohne Konfiguration fällt
    die Seite auf localStorage zurück, damit sie testbar bleibt.
 
+   Die Moderation meldet sich mit einem Passwort an. Geprüft wird es in der
+   Datenbank (bcrypt-Hash, für den anon-Key unlesbar); löschen und umschalten
+   gehen nur noch über security-definer-Funktionen, die ein Sitzungstoken
+   verlangen. Das Passwort steht in keiner Datei.
+
    Lokal im Browser gemerkt werden ausserdem:
    - Entwürfe der Formulare (überleben Seitenwechsel)
    - welche Aufgabe bereits abgegeben wurde (inkl. Abgabe-ID,
      damit der Stand zurückfällt, wenn die Moderation löscht)
+   - das Sitzungstoken der Moderation und je Aufgabe ein client_id-Schlüssel
    ============================================================ */
 (function () {
   'use strict';
@@ -16,6 +22,8 @@
   var POLL_MS = 4000;
   var DRAFT_KEY = 'dyadiq.draft.';
   var SENT_KEY = 'dyadiq.sent.';
+  var CID_KEY = 'dyadiq.cid.';
+  var TOKEN_KEY = 'dyadiq.token';
 
   /* ---------- Hilfsfunktionen ---------- */
   function esc(s) {
@@ -33,6 +41,26 @@
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
 
+  function uuid() {
+    if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+    var b = new Uint8Array(16);
+    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(b);
+    else for (var i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    var h = Array.prototype.map.call(b, function (x) { return (x + 0x100).toString(16).slice(1); }).join('');
+    return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) + '-' + h.slice(16, 20) + '-' + h.slice(20);
+  }
+
+  /* Stabiler Schlüssel je Aufgabe. Er bleibt über einen fehlgeschlagenen
+     Versuch hinweg gleich, damit ein zweiter Versuch dieselbe Zeile trifft
+     statt eine zweite anzulegen. */
+  function clientId(task) {
+    var k = CID_KEY + task, v = ls(k);
+    if (!v) { v = uuid(); lsSet(k, v); }
+    return v;
+  }
+
   /* ---------- Speicher-Schicht ---------- */
   var remote = {
     headers: function (extra) {
@@ -46,46 +74,75 @@
     },
     url: function (path) { return CFG.supabaseUrl.replace(/\/+$/, '') + '/rest/v1/' + path; },
 
+    /* Moderations-Funktionen in der Datenbank. Sie pruefen selbst, ob das
+       mitgeschickte Sitzungstoken gueltig ist -- diese Datei kann nichts
+       freigeben, was die Datenbank nicht erlaubt. */
+    rpc: function (name, args) {
+      return fetch(this.url('rpc/' + name), {
+        method: 'POST', headers: this.headers(), body: JSON.stringify(args || {})
+      }).then(function (r) {
+        return r.text().then(function (t) {
+          var d = null;
+          try { d = t ? JSON.parse(t) : null; } catch (e) { d = t; }
+          if (!r.ok) throw new Error((d && d.message) || t || ('rpc ' + r.status));
+          return d;
+        });
+      });
+    },
+
+    login: function (pw) { return this.rpc('presenter_login', { pw: pw }); },
+    ping: function (t) { return this.rpc('presenter_ping', { t: t }); },
+    logout: function (t) { return this.rpc('presenter_logout', { t: t }); },
+
     getState: function () {
       return fetch(this.url('session_state?select=discussion_open,reveal_open&id=eq.1'), { headers: this.headers() })
         .then(function (r) { if (!r.ok) throw new Error('state ' + r.status); return r.json(); })
         .then(function (rows) { return rows[0] || { discussion_open: false, reveal_open: false }; });
     },
     setState: function (patch) {
-      return fetch(this.url('session_state?id=eq.1'), {
-        method: 'PATCH',
-        headers: this.headers({ Prefer: 'return=minimal' }),
-        body: JSON.stringify(patch)
-      }).then(function (r) { if (!r.ok) throw new Error('setState ' + r.status); });
+      return this.rpc('presenter_set_state', {
+        t: token(),
+        discussion: 'discussion_open' in patch ? patch.discussion_open : null,
+        reveal: 'reveal_open' in patch ? patch.reveal_open : null
+      });
     },
     list: function () {
       return fetch(this.url('submissions?select=id,created_at,task,group_name,answers,key_statement&order=id.asc'), { headers: this.headers() })
         .then(function (r) { if (!r.ok) throw new Error('list ' + r.status); return r.json(); });
     },
     add: function (rec) {
+      var self = this;
       return fetch(this.url('submissions'), {
         method: 'POST',
         headers: this.headers({ Prefer: 'return=representation' }),
         body: JSON.stringify(rec)
       }).then(function (r) {
+        // 409 = diese client_id liegt schon in der Datenbank. Der erste Versuch
+        // war also erfolgreich, nur seine Antwort ist unterwegs verloren gegangen.
+        if (r.status === 409 && rec.client_id) return self.findByClientId(rec.client_id);
         if (!r.ok) return r.text().then(function (t) { throw new Error(t || ('add ' + r.status)); });
-        return r.json();
-      }).then(function (rows) { return (rows && rows[0]) || null; });
+        return r.json().then(function (rows) { return (rows && rows[0]) || null; });
+      });
+    },
+
+    findByClientId: function (cid) {
+      return fetch(this.url('submissions?select=id&client_id=eq.' + encodeURIComponent(cid)), { headers: this.headers() })
+        .then(function (r) { if (!r.ok) throw new Error('lookup ' + r.status); return r.json(); })
+        .then(function (rows) { return (rows && rows[0]) || null; });
     },
     remove: function (id) {
-      return fetch(this.url('submissions?id=eq.' + encodeURIComponent(id)), {
-        method: 'DELETE', headers: this.headers({ Prefer: 'return=minimal' })
-      }).then(function (r) { if (!r.ok) throw new Error('delete ' + r.status); });
+      return this.rpc('presenter_delete_submission', { t: token(), sub_id: id });
     },
     clear: function () {
-      return fetch(this.url('submissions?id=gt.0'), {
-        method: 'DELETE', headers: this.headers({ Prefer: 'return=minimal' })
-      }).then(function (r) { if (!r.ok) throw new Error('clear ' + r.status); });
+      return this.rpc('presenter_clear_submissions', { t: token() });
     }
   };
 
   var LK = 'dyadiq.local.';
   var local = {
+    login: function (pw) { return Promise.resolve(pw ? uuid() : null); },
+    ping: function (t) { return Promise.resolve(!!t); },
+    logout: function () { return Promise.resolve(); },
     getState: function () {
       return Promise.resolve({
         discussion_open: ls(LK + 'discussion') === '1',
@@ -103,6 +160,8 @@
     list: function () { return Promise.resolve(this._rows()); },
     add: function (rec) {
       var rows = this._rows();
+      var dup = rows.filter(function (r) { return r.client_id && r.client_id === rec.client_id; })[0];
+      if (dup) return Promise.resolve(dup);
       rec.id = (rows.length ? rows[rows.length - 1].id : 0) + 1;
       rec.created_at = new Date().toISOString();
       rows.push(rec);
@@ -120,7 +179,10 @@
 
   /* ---------- Moderationsmodus ---------- */
   var params = new URLSearchParams(location.search);
-  var isPresenter = !!(CFG.presenterCode && params.get('presenter') === CFG.presenterCode);
+  var wantsPresenter = params.has('presenter');
+  var sessionToken = ls(TOKEN_KEY);
+  function token() { return sessionToken; }
+  function isPresenter() { return !!sessionToken; }
 
   /* ---------- Verbindungshinweis ---------- */
   var banner = $('conn-banner');
@@ -288,7 +350,7 @@
   var lastConfirmedAt = 0;     // Zeitpunkt der letzten bestaetigten Abgabe
 
   function renderState() {
-    var open = state.discussion_open || isPresenter;
+    var open = state.discussion_open || isPresenter();
     show($('locked-screen'), !open);
     show($('discussion-content'), open);
     show($('reveal-locked'), !state.reveal_open);
@@ -339,11 +401,12 @@
         if (!form.classList.contains('is-submitted')) markSubmitted(form, true);
       } else if (startedAt > lastConfirmedAt) {
         lsDel(SENT_KEY + form.dataset.task);
+        lsDel(CID_KEY + form.dataset.task);   // naechster Versuch: neuer Schluessel
         markSubmitted(form, false);
       }
     });
 
-    var json = JSON.stringify(rows) + '|' + isPresenter;
+    var json = JSON.stringify(rows) + '|' + isPresenter();
     if (json === lastSubsJSON) return;
     lastSubsJSON = json;
 
@@ -393,35 +456,110 @@
     return inFlight;
   }
 
-  /* ---------- Moderationsleiste ---------- */
-  if (isPresenter) {
+  /* ---------- Anmeldung der Moderation ---------- */
+  function enterPresenterMode() {
+    show($('presenter-login'), false);
     show($('presenter-bar'), true);
     document.body.classList.add('is-presenter');
+    lastSubsJSON = '';
+    renderState();
+    tick();
+  }
 
+  function leavePresenterMode() {
+    sessionToken = null;
+    lsDel(TOKEN_KEY);
+    document.body.classList.remove('is-presenter');
+    show($('presenter-bar'), false);
+  }
+
+  if (wantsPresenter) {
+    if (sessionToken) {
+      // Gespeichertem Token nicht glauben, sondern nachfragen.
+      store.ping(sessionToken).then(function (ok) {
+        if (ok) enterPresenterMode();
+        else { leavePresenterMode(); show($('presenter-login'), true); }
+      }).catch(function () {
+        leavePresenterMode(); show($('presenter-login'), true);
+      });
+    } else {
+      show($('presenter-login'), true);
+    }
+  }
+
+  var loginForm = $('presenter-login-form');
+  if (loginForm) loginForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var pw = $('presenter-password');
+    var err = $('presenter-login-error');
+    var btn = loginForm.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    err.textContent = 'Wird geprüft …';
+    store.login(pw.value).then(function (t) {
+      if (!t) {
+        btn.disabled = false;
+        err.textContent = 'Passwort stimmt nicht.';
+        pw.select();
+        return;
+      }
+      sessionToken = t;
+      lsSet(TOKEN_KEY, t);
+      pw.value = '';
+      err.textContent = '';
+      enterPresenterMode();
+    }).catch(function (ex) {
+      btn.disabled = false;
+      err.textContent = 'Anmeldung fehlgeschlagen: ' + ex.message;
+    });
+  });
+
+  var logoutBtn = $('presenter-logout');
+  if (logoutBtn) logoutBtn.addEventListener('click', function () {
+    var t = sessionToken;
+    leavePresenterMode();
+    if (t) store.logout(t).catch(function () {});
+    location.href = 'diskussion.html';
+  });
+
+  /* Läuft die Sitzung ab, wieder zur Anmeldung statt stumm scheitern. */
+  function onPresenterError(what) {
+    return function (err) {
+      if (/nicht angemeldet|42501/i.test(err.message)) {
+        leavePresenterMode();
+        show($('presenter-login'), true);
+        renderState();
+        return;
+      }
+      alert(what + ': ' + err.message);
+    };
+  }
+
+  /* ---------- Moderationsleiste ---------- */
+  {
     var td = $('toggle-discussion'), tr = $('toggle-reveal'), ca = $('clear-all');
     if (td) td.addEventListener('click', function () {
       store.setState({ discussion_open: !state.discussion_open }).then(tick)
-        .catch(function (e) { alert('Konnte nicht umschalten: ' + e.message); });
+        .catch(onPresenterError('Konnte nicht umschalten'));
     });
     if (tr) tr.addEventListener('click', function () {
       store.setState({ reveal_open: !state.reveal_open }).then(tick)
-        .catch(function (e) { alert('Konnte nicht umschalten: ' + e.message); });
+        .catch(onPresenterError('Konnte nicht umschalten'));
     });
     if (ca) ca.addEventListener('click', function () {
       if (!confirm('Wirklich ALLE Abgaben löschen? Das lässt sich nicht rückgängig machen.')) return;
-      store.clear().then(tick).catch(function (e) { alert('Löschen fehlgeschlagen: ' + e.message); });
+      store.clear().then(tick).catch(onPresenterError('Löschen fehlgeschlagen'));
     });
 
     // Einzelne Abgabe löschen (Delegation, weil neu gerendert wird)
     var grid = $('results-grid');
     if (grid) grid.addEventListener('click', function (e) {
       var btn = e.target.closest && e.target.closest('[data-del]');
-      if (!btn) return;
+      if (!btn || !isPresenter()) return;
       if (!confirm('Diese Abgabe löschen?')) return;
       btn.disabled = true;
       store.remove(Number(btn.getAttribute('data-del')))
         .then(function () { lastSubsJSON = ''; return tick(); })
-        .catch(function (err) { btn.disabled = false; alert('Löschen fehlgeschlagen: ' + err.message); });
+        .catch(function (err) { btn.disabled = false; onPresenterError('Löschen fehlgeschlagen')(err); });
     });
   }
 
@@ -473,7 +611,8 @@
       store.add({
         task: Number(form.dataset.task),
         group_name: group.slice(0, 60),
-        answers: { items: items }
+        answers: { items: items },
+        client_id: clientId(form.dataset.task)
       }).then(function (row) {
         lastConfirmedAt = Date.now();
         if (row && row.id != null) lsSet(SENT_KEY + form.dataset.task, String(row.id));

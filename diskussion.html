@@ -33,13 +33,27 @@
 <!-- Verbindungshinweis -->
 <div class="conn-banner is-hidden" id="conn-banner" role="status"></div>
 
-<!-- Moderationsleiste (nur mit ?presenter=CODE) -->
+<!-- Moderationsleiste (erst nach Anmeldung über ?presenter) -->
 <div class="presenter-bar is-hidden" id="presenter-bar">
   <span class="presenter-tag">Moderation</span>
   <button class="pbtn" id="toggle-discussion" type="button">Demo freischalten</button>
   <button class="pbtn" id="toggle-reveal" type="button">Auflösung freischalten</button>
   <button class="pbtn pbtn-danger" id="clear-all" type="button">Alle Abgaben löschen</button>
   <span class="presenter-count" id="presenter-count">–</span>
+  <button class="pbtn pbtn-quiet" id="presenter-logout" type="button">Abmelden</button>
+</div>
+
+<!-- Anmeldung der Moderation. Das Passwort prüft die Datenbank, nicht diese Seite. -->
+<div class="presenter-login is-hidden" id="presenter-login">
+  <form class="presenter-login-box" id="presenter-login-form">
+    <span class="kicker kicker-sm">Moderation</span>
+    <h2>Anmelden</h2>
+    <label class="plogin-label" for="presenter-password">Passwort</label>
+    <input class="plogin-input" id="presenter-password" type="password" name="password"
+           autocomplete="current-password" required>
+    <p class="plogin-error" id="presenter-login-error" role="alert"></p>
+    <button class="btn btn-md" type="submit">Anmelden</button>
+  </form>
 </div>
 
 <main>

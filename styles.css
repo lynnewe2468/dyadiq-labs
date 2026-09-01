@@ -1330,3 +1330,25 @@ textarea.is-over:focus { border-color: oklch(0.6 0.16 25 / .8); }
   .kb, .report-section { scroll-margin-top: 128px; }
   .task { scroll-margin-top: 152px; }
 }
+
+/* ---------- Anmeldung der Moderation ---------- */
+.presenter-login { display: flex; align-items: center; justify-content: center; min-height: 68vh; padding: 80px var(--pad-x); }
+.presenter-login-box {
+  width: 100%; max-width: 360px;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 32px 30px 30px;
+  background: var(--surface);
+  border: 1px solid var(--hairline); border-radius: 16px;
+}
+.presenter-login-box h2 { font-size: 24px; font-weight: 800; margin: 2px 0 8px; }
+.plogin-label { font-size: 13px; font-weight: 600; color: var(--text-78); }
+.plogin-input {
+  width: 100%; box-sizing: border-box;
+  background: var(--bg-deep); border: 1px solid var(--hairline); border-radius: 8px;
+  color: var(--text); font-family: inherit; font-size: 15px; padding: 11px 13px;
+}
+.plogin-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.plogin-error { min-height: 18px; margin: 0; font-size: 13.5px; color: #e8a0a0; color: oklch(0.78 0.14 25); }
+.presenter-login-box .btn { margin-top: 6px; text-align: center; }
+.pbtn-quiet { color: var(--text-muted); border-color: transparent; }
+.pbtn-quiet:hover { color: var(--text-85); border-color: var(--hairline); }
